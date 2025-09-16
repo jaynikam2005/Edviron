@@ -57,22 +57,6 @@ const SchoolTransactions: React.FC = () => {
     'test_school_002',
   ];
 
-  useEffect(() => {
-    if (selectedSchool) {
-      fetchSchoolTransactions();
-    } else {
-      setTransactions([]);
-      setPagination({
-        current_page: 1,
-        total_pages: 1,
-        total_items: 0,
-        items_per_page: 10,
-        has_next: false,
-        has_prev: false,
-      });
-    }
-  }, [selectedSchool, filters, fetchSchoolTransactions]);
-
   const fetchSchoolTransactions = useCallback(async () => {
     if (!selectedSchool) return;
     
@@ -92,11 +76,27 @@ const SchoolTransactions: React.FC = () => {
     }
   }, [selectedSchool, filters]);
 
+  useEffect(() => {
+    if (selectedSchool) {
+      fetchSchoolTransactions();
+    } else {
+      setTransactions([]);
+      setPagination({
+        current_page: 1,
+        total_pages: 1,
+        total_items: 0,
+        items_per_page: 10,
+        has_next: false,
+        has_prev: false,
+      });
+    }
+  }, [selectedSchool, filters, fetchSchoolTransactions]);
+
   const handleFilterChange = (key: string, value: string | number) => {
     setFilters(prev => ({
       ...prev,
       [key]: value,
-      page: key !== 'page' ? 1 : value,
+      page: key !== 'page' ? 1 : Number(value),
     }));
   };
 

@@ -109,7 +109,7 @@ const SchoolTransactionSearch: React.FC = () => {
     setFilters(prev => ({
       ...prev,
       [key]: value,
-      page: key !== 'page' ? 1 : value,
+      page: key !== 'page' ? 1 : Number(value),
     }));
   };
 

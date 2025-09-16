@@ -233,6 +233,16 @@ const Transactions: React.FC = () => {
     );
   }
 
+  const getStatusDisplayText = () => {
+    if (filters.statuses.length === 0) {
+      return 'All statuses';
+    }
+    if (filters.statuses.length === 1) {
+      const status = statusOptions.find(s => s.value === filters.statuses[0]);
+      return status?.label || filters.statuses[0];
+    }
+    return `${filters.statuses.length} statuses selected`;
+  };
   return (
     <div className="space-y-6">
       {/* Header */}

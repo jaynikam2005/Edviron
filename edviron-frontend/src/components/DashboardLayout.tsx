@@ -4,7 +4,8 @@ import { useTheme } from '../hooks/useTheme';
 
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { theme, isDark, toggleTheme } = useTheme();
+  const themeData = useTheme() || { theme: 'light', isDark: false, toggleTheme: () => {} };
+  const { theme, isDark, toggleTheme } = themeData;
   const navigate = useNavigate();
   const location = useLocation();
   const handleLogout = () => {
