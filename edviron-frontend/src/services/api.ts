@@ -19,7 +19,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    return Promise.reject(error);
+    return Promise.reject(new Error(error?.message || 'Request failed'));
   }
 );
 
@@ -66,7 +66,10 @@ export const apiService = {
 
   // Webhook management
   webhooks: {
-    getLogs: (limit?: number) => api.get(`/payment/webhook-logs${limit ? `?limit=${limit}` : ''}`),
+    getLogs: (limit?: number) => {
+      const params = limit ? `?limit=${limit}` : '';
+      return api.get(`/payment/webhook-logs${params}`);
+    },
     getLogsByStatus: (status: string) => api.get(`/payment/webhook-logs/status/${status}`),
   },
 
@@ -88,7 +91,9 @@ export const apiService = {
           }
         });
       }
-      return api.get(`/transactions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`);
+      const query = queryParams.toString();
+      const url = query ? `/transactions?${query}` : '/transactions';
+      return api.get(url);
     },
     getBySchool: (schoolId: string, params?: {
       page?: number;
@@ -104,7 +109,9 @@ export const apiService = {
           }
         });
       }
-      return api.get(`/transactions/school/${schoolId}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`);
+      const query = queryParams.toString();
+      const url = query ? `/transactions/school/${schoolId}?${query}` : `/transactions/school/${schoolId}`;
+      return api.get(url);
     },
     getStatus: (customOrderId: string) => api.get(`/transaction-status/${customOrderId}`),
   },

@@ -87,7 +87,7 @@ const Transactions: React.FC = () => {
     const updatedFilters = { ...filters, ...newFilters };
     
     // Reset page when changing filters (except page itself)
-    if (!Object.prototype.hasOwnProperty.call(newFilters, 'page')) {
+    if (!Object.hasOwn(newFilters, 'page')) {
       updatedFilters.page = 1;
     }
 
@@ -302,9 +302,7 @@ const Transactions: React.FC = () => {
               className="w-full input-field text-left flex items-center justify-between"
             >
               <span className="truncate">
-                {filters.statuses.length === 0 ? 'All Statuses' : 
-                 filters.statuses.length === 1 ? statusOptions.find(s => s.value === filters.statuses[0])?.label :
-                 `${filters.statuses.length} statuses selected`}
+                {getStatusDisplayText()}
               </span>
               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -669,9 +667,11 @@ const Transactions: React.FC = () => {
 
       {/* Click outside to close dropdown */}
       {showStatusDropdown && (
-        <div 
-          className="fixed inset-0 z-0" 
+        <button 
+          type="button"
+          className="fixed inset-0 z-0 bg-transparent border-0 cursor-default" 
           onClick={() => setShowStatusDropdown(false)}
+          aria-label="Close status dropdown"
         />
       )}
     </div>

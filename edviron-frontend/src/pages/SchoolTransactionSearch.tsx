@@ -172,13 +172,14 @@ const SchoolTransactionSearch: React.FC = () => {
       {/* School Search */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <div className="max-w-md">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="school-search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Search School
           </label>
           <div className="relative">
             <div className="flex">
               <div className="relative flex-1">
                 <input
+                  id="school-search"
                   type="text"
                   value={searchTerm}
                   onChange={(e) => handleSearchChange(e.target.value)}
@@ -247,10 +248,11 @@ const SchoolTransactionSearch: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="sort-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Sort By
                 </label>
                 <select
+                  id="sort-select"
                   value={filters.sort}
                   onChange={(e) => handleFilterChange('sort', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -263,10 +265,11 @@ const SchoolTransactionSearch: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="order-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Order
                 </label>
                 <select
+                  id="order-select"
                   value={filters.order}
                   onChange={(e) => handleFilterChange('order', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -277,10 +280,11 @@ const SchoolTransactionSearch: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="items-per-page" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Items per page
                 </label>
                 <select
+                  id="items-per-page"
                   value={filters.limit}
                   onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -508,9 +512,11 @@ const SchoolTransactionSearch: React.FC = () => {
 
       {/* Click outside to close dropdown */}
       {showDropdown && (
-        <div 
-          className="fixed inset-0 z-0" 
+        <button 
+          type="button"
+          className="fixed inset-0 z-0 bg-transparent border-0 cursor-default" 
           onClick={() => setShowDropdown(false)}
+          aria-label="Close dropdown"
         />
       )}
     </div>

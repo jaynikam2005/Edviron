@@ -101,7 +101,18 @@ const DashboardLayout: React.FC = () => {
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+          <div 
+            className="fixed inset-0 bg-gray-600 bg-opacity-75" 
+            onClick={() => setSidebarOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+                setSidebarOpen(false);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Close sidebar"
+          />
         </div>
       )}
 

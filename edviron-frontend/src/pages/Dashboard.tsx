@@ -66,6 +66,17 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const getStatusClass = (status: string): string => {
+    switch (status) {
+      case 'success':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-red-100 text-red-800';
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -187,11 +198,7 @@ const Dashboard: React.FC = () => {
                       ₹{transaction.transaction_amount?.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        transaction.status === 'success' ? 'bg-green-100 text-green-800' :
-                        transaction.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusClass(transaction.status)}`}>
                         {transaction.status}
                       </span>
                     </td>

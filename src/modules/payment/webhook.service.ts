@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { OrderStatus, OrderStatusDocument } from '../../schemas/order-status.schema';
@@ -11,14 +11,12 @@ export class WebhookService {
   private readonly logger = new Logger(WebhookService.name);
 
   constructor(
-    @InjectModel(OrderStatus.name) private orderStatusModel: Model<OrderStatusDocument>,
-    @InjectModel(WebhookLogs.name) private webhookLogsModel: Model<WebhookLogsDocument>,
-    @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
+    @InjectModel(OrderStatus.name) private readonly orderStatusModel: Model<OrderStatusDocument>,
+    @InjectModel(WebhookLogs.name) private readonly webhookLogsModel: Model<WebhookLogsDocument>,
+    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
   ) {}
 
   async processWebhook(payload: WebhookPayloadDto): Promise<WebhookResponseDto> {
-    const startTime = new Date();
-    
     try {
       this.logger.log(`Processing webhook for order: ${payload.order_info.order_id}`);
       
@@ -69,7 +67,7 @@ export class WebhookService {
 
   private async findOrder(orderInfo: any): Promise<OrderDocument | null> {
     // Try to find by MongoDB _id first
-    if (orderInfo.order_id && orderInfo.order_id.match(/^[0-9a-fA-F]{24}$/)) {
+    if (orderInfo.order_id?.match(/^[0-9a-fA-F]{24}$/)) {
       const order = await this.orderModel.findById(orderInfo.order_id).exec();
       if (order) return order;
     }

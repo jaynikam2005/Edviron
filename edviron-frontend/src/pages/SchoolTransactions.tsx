@@ -135,11 +135,12 @@ const SchoolTransactions: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="school-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Select School
             </label>
             <div className="flex space-x-2">
               <select
+                id="school-select"
                 value={selectedSchool}
                 onChange={(e) => handleSchoolChange(e.target.value)}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -156,10 +157,11 @@ const SchoolTransactions: React.FC = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="custom-school-id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Custom School ID
             </label>
             <input
+              id="custom-school-id"
               type="text"
               value={selectedSchool}
               onChange={(e) => handleSchoolChange(e.target.value)}
@@ -176,10 +178,11 @@ const SchoolTransactions: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="sort-by-school" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Sort By
                 </label>
                 <select
+                  id="sort-by-school"
                   value={filters.sort}
                   onChange={(e) => handleFilterChange('sort', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -206,10 +209,11 @@ const SchoolTransactions: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="items-per-page-school" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Items per page
                 </label>
                 <select
+                  id="items-per-page-school"
                   value={filters.limit}
                   onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"

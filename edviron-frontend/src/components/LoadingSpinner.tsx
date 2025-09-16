@@ -63,7 +63,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
           <div className="flex space-x-1">
             {[0, 1, 2].map((i) => (
               <div
-                key={i}
+                key={`dot-${i}`}
                 className={`${sizeClasses[size].replace('w-', 'w-').replace('h-', 'h-').split(' ')[0].replace('w-', 'w-2 h-2')} ${colorClasses[variant]} bg-current rounded-full animate-pulse`}
                 style={{
                   animationDelay: `${i * 0.2}s`,
@@ -84,7 +84,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
           <div className="flex space-x-1 items-end">
             {[0, 1, 2, 3].map((i) => (
               <div
-                key={i}
+                key={`bar-${i}`}
                 className={`w-1 ${colorClasses[variant]} bg-current animate-pulse`}
                 style={{
                   height: `${12 + (i % 2) * 8}px`,
@@ -161,10 +161,15 @@ export const LoadingSkeleton: React.FC<{
   lines?: number;
   className?: string;
 }> = ({ lines = 3, className = '' }) => {
+  const lineIds = React.useMemo(() => 
+    Array.from({ length: lines }, (_, i) => `skeleton-${Date.now()}-${i}`), 
+    [lines]
+  );
+
   return (
     <div className={`animate-pulse space-y-3 ${className}`}>
-      {Array.from({ length: lines }).map((_, i) => (
-        <div key={i} className="flex space-x-4">
+      {lineIds.map((id) => (
+        <div key={id} className="flex space-x-4">
           <div className="rounded-full bg-gray-300 dark:bg-gray-600 h-10 w-10"></div>
           <div className="flex-1 space-y-2 py-1">
             <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4"></div>
@@ -182,24 +187,39 @@ export const TableSkeleton: React.FC<{
   columns?: number;
   className?: string;
 }> = ({ rows = 5, columns = 4, className = '' }) => {
+  const headerIds = React.useMemo(() => 
+    Array.from({ length: columns }, (_, i) => `header-${Date.now()}-${i}`), 
+    [columns]
+  );
+  
+  const rowData = React.useMemo(() => 
+    Array.from({ length: rows }, (_, rowIndex) => ({
+      id: `row-${Date.now()}-${rowIndex}`,
+      cells: Array.from({ length: columns }, (_, colIndex) => 
+        `cell-${Date.now()}-${rowIndex}-${colIndex}`
+      )
+    })), 
+    [rows, columns]
+  );
+
   return (
     <div className={`animate-pulse ${className}`}>
       <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
         <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              {Array.from({ length: columns }).map((_, i) => (
-                <th key={i} className="px-6 py-3">
+              {headerIds.map((id) => (
+                <th key={id} className="px-6 py-3">
                   <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-20"></div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-            {Array.from({ length: rows }).map((_, rowIndex) => (
-              <tr key={rowIndex}>
-                {Array.from({ length: columns }).map((_, colIndex) => (
-                  <td key={colIndex} className="px-6 py-4">
+            {rowData.map((row) => (
+              <tr key={row.id}>
+                {row.cells.map((cellId) => (
+                  <td key={cellId} className="px-6 py-4">
                     <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-full"></div>
                   </td>
                 ))}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   LineChart,
   Line,
@@ -30,6 +30,7 @@ interface StatusDistribution {
   name: string;
   value: number;
   color: string;
+  [key: string]: string | number; // Index signature for ChartDataInput compatibility
 }
 
 interface AnalyticsData {
@@ -41,38 +42,40 @@ interface AnalyticsData {
   averageAmount: number;
 }
 
+interface TooltipEntry {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipEntry[];
+  label?: string;
+}
+
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
+  if (active && payload?.length) {
+    return (
+      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
+        <p className="font-medium text-gray-900 dark:text-white mb-2">{label}</p>
+        {payload.map((entry) => (
+          <p key={`tooltip-${entry.name}`} className="text-sm" style={{ color: entry.color }}>
+            {entry.name}: {entry.value}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 const Analytics: React.FC = () => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [timeRange, setTimeRange] = useState('7d'); // 7d, 30d, 90d
   const [refreshing, setRefreshing] = useState(false);
-
-  useEffect(() => {
-    fetchAnalyticsData();
-  }, [timeRange]); // fetchAnalyticsData is stable and doesn't need to be in deps
-
-  const fetchAnalyticsData = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      
-      // Simulate API call - in real app, this would fetch from analytics endpoint
-      const response = await apiService.transactions.getAll({ limit: 100 });
-      const transactions = response.data.data || [];
-      
-      // Process data for charts
-      const processedData = processTransactionData();
-      setAnalyticsData(processedData);
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || 'Failed to fetch analytics data');
-      console.error('Analytics error:', err);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
 
   const processTransactionData = (): AnalyticsData => {
     // Generate sample trend data for the last 7 days
@@ -119,32 +122,35 @@ const Analytics: React.FC = () => {
     };
   };
 
+  const fetchAnalyticsData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      // Simulate API call - in real app, this would fetch from analytics endpoint
+      await apiService.transactions.getAll({ limit: 100 });
+      
+      // Process data for charts
+      const processedData = processTransactionData();
+      setAnalyticsData(processedData);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to fetch analytics data');
+      console.error('Analytics error:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [fetchAnalyticsData]);
+
   const handleRefresh = () => {
     setRefreshing(true);
     fetchAnalyticsData();
-  };
-
-  const CustomTooltip = ({ active, payload, label }: {
-    active?: boolean;
-    payload?: Array<{ name: string; value: number; color: string }>;
-    label?: string;
-  }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900 dark:text-white mb-2">{label}</p>
-          {payload.map((entry, index: number) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
-  if (loading && !analyticsData) {
+  };  if (loading && !analyticsData) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -375,14 +381,12 @@ const Analytics: React.FC = () => {
                       data={analyticsData.statusDistribution}
                       cx="50%"
                       cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {analyticsData.statusDistribution.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      {analyticsData.statusDistribution.map((entry) => (
+                        <Cell key={`pie-cell-${entry.name}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip content={<CustomTooltip />} />

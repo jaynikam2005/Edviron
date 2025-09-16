@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { Theme, getStoredTheme, setStoredTheme, getSystemTheme } from '../utils/themeUtils';
+import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
+import type { Theme } from '../utils/themeUtils';
+import { getStoredTheme, setStoredTheme, getSystemTheme } from '../utils/themeUtils';
 
 interface ThemeContextType {
   theme: Theme;
@@ -11,8 +12,8 @@ interface ThemeContextType {
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>(getStoredTheme);
-  const [systemIsDark, setSystemIsDark] = useState(getSystemTheme);
+  const [theme, setThemeValue] = useState<Theme>(() => getStoredTheme());
+  const [systemIsDark, setSystemIsDark] = useState(() => getSystemTheme());
 
   // Calculate if dark mode should be active
   const isDark = theme === 'dark' || (theme === 'system' && systemIsDark);
@@ -25,16 +26,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setSystemIsDark(e.matches);
     };
 
-    // Modern browsers
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    }
-    // Legacy browsers
-    else if (mediaQuery.addListener) {
-      mediaQuery.addListener(handleChange);
-      return () => mediaQuery.removeListener(handleChange);
-    }
+    // Use modern addEventListener API
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   // Update DOM classes when theme changes
@@ -57,7 +51,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [isDark]);
 
   const setTheme = useCallback((newTheme: Theme) => {
-    setThemeState(newTheme);
+    setThemeValue(newTheme);
     setStoredTheme(newTheme);
     
     // Dispatch custom event for other components to listen
@@ -74,12 +68,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [theme, systemIsDark, setTheme]);
 
-  const value = {
+  const value = useMemo(() => ({
     theme,
     isDark,
     setTheme,
     toggleTheme,
-  };
+  }), [theme, isDark, setTheme, toggleTheme]);
 
   return (
     <ThemeContext.Provider value={value}>

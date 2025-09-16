@@ -12,8 +12,8 @@ export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
 
   constructor(
-    @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
-    private configService: ConfigService,
+    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
+    private readonly configService: ConfigService,
   ) {}
 
   async createPayment(createPaymentDto: CreatePaymentDto): Promise<PaymentResponseDto> {
