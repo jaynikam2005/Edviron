@@ -42,7 +42,11 @@ export class TransactionController {
     @Query(ValidationPipe) query: TransactionQueryDto,
     @Request() req: AuthenticatedRequest,
   ): Promise<PaginatedTransactionResponseDto> {
-    return this.transactionService.getTransactionsBySchool(schoolId, query, req.user);
+    return this.transactionService.getTransactionsBySchool(
+      schoolId,
+      query,
+      req.user,
+    );
   }
 }
 
@@ -51,11 +55,12 @@ export class TransactionController {
 export class TransactionStatusController {
   constructor(private readonly transactionService: TransactionService) {}
 
-  @Get(':customOrderId')
+    @Get(':custom_order_id')
   async getTransactionStatus(
-    @Param('customOrderId') customOrderId: string,
-    @Request() req: AuthenticatedRequest,
-  ): Promise<TransactionStatusResponseDto> {
-    return this.transactionService.getTransactionStatus(customOrderId, req.user);
+    @Param('custom_order_id') customOrderId: string,
+  ) {
+    return await this.transactionService.getTransactionStatus(
+      customOrderId,
+    );
   }
 }

@@ -11,26 +11,20 @@ export class Order {
   @Prop({ required: true })
   trustee_id: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   custom_order_id: string;
 
   @Prop({ required: true })
   gateway_name: string;
 
-  @Prop({ required: true })
-  order_amount: number;
-
-  @Prop({ required: true })
-  transaction_amount: number;
-
-  @Prop({ required: true })
-  payment_mode: string;
-
-  @Prop({ required: true })
-  status: string;
-
-  @Prop({ required: true })
-  payment_time: Date;
+  @Prop({ required: true, type: Object })
+  student_info: {
+    name: string;
+    id: string;
+    email: string;
+    class?: string;
+    section?: string;
+  };
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);

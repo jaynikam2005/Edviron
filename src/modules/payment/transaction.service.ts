@@ -31,6 +31,43 @@ export class TransactionService {
     private readonly orderStatusModel: Model<OrderStatusDocument>,
   ) {}
 
+  private validateDemoUser(
+    user?: { email?: string; userId?: string; role?: string },
+    operation?: string,
+  ): boolean {
+    const isDemoUser = user?.email === 'admin@edviron.com';
+    
+    if (!isDemoUser && operation) {
+      this.logger.log(
+        `Non-demo user ${user?.email || 'unknown'} attempted to access ${operation}`,
+      );
+    } else if (isDemoUser && operation) {
+      this.logger.log(`Demo user ${user?.email} accessing ${operation}`);
+    }
+    
+    return isDemoUser;
+  }
+
+  private getEmptyTransactionResponse(
+    query: TransactionQueryDto,
+  ): PaginatedTransactionResponseDto {
+    return {
+      data: [],
+      pagination: {
+        current_page: query.page || 1,
+        total_pages: 0,
+        total_items: 0,
+        items_per_page: query.limit || 10,
+        has_next: false,
+        has_prev: false,
+      },
+      sort: {
+        field: query.sort || 'payment_time',
+        order: query.order || 'desc',
+      },
+    };
+  }
+
   private buildMatchConditions(
     query: TransactionQueryDto,
   ): Record<string, any> {
@@ -76,30 +113,12 @@ export class TransactionService {
     user?: { email?: string; userId?: string; role?: string },
   ): Promise<PaginatedTransactionResponseDto> {
     // Check if user is the demo user
-    const isDemoUser = user?.email === 'admin@edviron.com';
+    const isDemoUser = this.validateDemoUser(user, 'transactions');
     
     // For non-demo users, return empty results
     if (!isDemoUser) {
-      this.logger.log(`Non-demo user ${user?.email || 'unknown'} attempted to access transactions`);
-      return {
-        data: [],
-        pagination: {
-          current_page: query.page || 1,
-          total_pages: 0,
-          total_items: 0,
-          items_per_page: query.limit || 10,
-          has_next: false,
-          has_prev: false,
-        },
-        sort: {
-          field: query.sort || 'payment_time',
-          order: query.order || 'desc',
-        },
-      };
+      return this.getEmptyTransactionResponse(query);
     }
-    
-    // Demo user - show all data
-    this.logger.log(`Demo user ${user?.email} accessing transactions`);
     const {
       page = 1,
       limit = 10,
@@ -198,30 +217,15 @@ export class TransactionService {
     user?: { email?: string; userId?: string; role?: string },
   ): Promise<PaginatedTransactionResponseDto> {
     // Check if user is the demo user
-    const isDemoUser = user?.email === 'admin@edviron.com';
+    const isDemoUser = this.validateDemoUser(
+      user,
+      `school transactions for ${schoolId}`,
+    );
     
     // For non-demo users, return empty results
     if (!isDemoUser) {
-      this.logger.log(`Non-demo user ${user?.email || 'unknown'} attempted to access school transactions for ${schoolId}`);
-      return {
-        data: [],
-        pagination: {
-          current_page: query.page || 1,
-          total_pages: 0,
-          total_items: 0,
-          items_per_page: query.limit || 10,
-          has_next: false,
-          has_prev: false,
-        },
-        sort: {
-          field: query.sort || 'payment_time',
-          order: query.order || 'desc',
-        },
-      };
+      return this.getEmptyTransactionResponse(query);
     }
-    
-    // Demo user - show all data
-    this.logger.log(`Demo user ${user?.email} accessing school transactions for ${schoolId}`);
     const {
       page = 1,
       limit = 10,
@@ -345,18 +349,17 @@ export class TransactionService {
     user?: { email?: string; userId?: string; role?: string },
   ): Promise<TransactionStatusResponseDto> {
     // Check if user is the demo user
-    const isDemoUser = user?.email === 'admin@edviron.com';
+    const isDemoUser = this.validateDemoUser(
+      user,
+      `transaction status for ${customOrderId}`,
+    );
     
     // For non-demo users, deny access
     if (!isDemoUser) {
-      this.logger.log(`Non-demo user ${user?.email || 'unknown'} attempted to access transaction status for ${customOrderId}`);
       throw new NotFoundException(
         `Transaction with custom_order_id '${customOrderId}' not found`,
       );
     }
-    
-    // Demo user - proceed with normal logic
-    this.logger.log(`Demo user ${user?.email} accessing transaction status for ${customOrderId}`);
     const pipeline = [
       {
         $match: { custom_order_id: customOrderId },

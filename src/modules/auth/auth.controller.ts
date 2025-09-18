@@ -6,6 +6,7 @@ import {
   Request,
   ValidationPipe,
   Get,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from '../../guards/local-auth.guard';
@@ -19,16 +20,57 @@ interface AuthenticatedRequest {
     _id: string;
     role: string;
   };
+  ip?: string;
+  headers?: {
+    'user-agent'?: string;
+  };
+}
+
+interface RefreshTokenRequest {
+  refreshToken: string;
 }
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('login')
-  async login(@Body(ValidationPipe) loginDto: LoginDto) {
-    return await this.authService.login(loginDto);
+  async login(
+    @Body(ValidationPipe) loginDto: LoginDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const ipAddress = req.ip;
+    const userAgent = req.headers?.['user-agent'];
+    return await this.authService.login(loginDto, ipAddress, userAgent);
+  }
+
+  @Public()
+  @Post('refresh')
+  async refreshToken(
+    @Body() body: RefreshTokenRequest,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const ipAddress = req.ip;
+    const userAgent = req.headers?.['user-agent'];
+    return await this.authService.refreshToken(
+      body.refreshToken,
+      ipAddress,
+      userAgent,
+    );
+  }
+
+  @Public()
+  @Post('logout')
+  async logout(@Body() body: RefreshTokenRequest) {
+    return await this.authService.logout(body.refreshToken);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout-all')
+  async logoutAll(@Request() req: AuthenticatedRequest) {
+    await this.authService.revokeAllTokens(req.user._id);
+    return { message: 'All tokens revoked successfully' };
   }
 
   @UseGuards(JwtAuthGuard)
