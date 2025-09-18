@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "resolvePackageJsonExports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -20,7 +20,15 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "strict": false
   },
+  "include": [
+    "src/**/*",
+    "scripts/**/*"
+  ],
   "exclude": ["edviron-frontend", "node_modules", "dist"]
 }
