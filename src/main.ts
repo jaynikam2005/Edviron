@@ -36,6 +36,9 @@ async function bootstrap() {
       'http://localhost:5174',
       'http://localhost:5175',
       'http://localhost:5176',
+      // Add Vercel domains for production
+      /https:\/\/.*\.vercel\.app$/,
+      process.env.FRONTEND_URL || 'http://localhost:5173',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],

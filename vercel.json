@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "edviron",
   "builds": [
     {
       "src": "edviron-frontend/package.json",
@@ -7,9 +8,20 @@
       "config": {
         "distDir": "dist"
       }
+    },
+    {
+      "src": "src/main.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["dist/**", "package.json", "node_modules/**"]
+      }
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts"
+    },
     {
       "handle": "filesystem"
     },
@@ -37,6 +49,18 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
         }
       ]
     },
@@ -50,6 +74,12 @@
       ]
     }
   ],
+  "functions": {
+    "api/index.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
   "env": {
     "NODE_VERSION": "18"
   }

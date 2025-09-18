@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "build:prod": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -20,7 +21,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "init-db": "ts-node src/scripts/init-db.ts",
     "seed-demo": "node src/scripts/seed-demo-data.js",
-    "create-demo-user": "node src/scripts/create-demo-user.js"
+    "create-demo-user": "node src/scripts/create-demo-user.js",
+    "vercel-build": "npm run build",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
