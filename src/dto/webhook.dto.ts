@@ -1,5 +1,23 @@
 import { IsString, IsOptional, IsNumber } from 'class-validator';
 
+export class OrderInfoDto {
+  @IsOptional()
+  @IsString()
+  order_id?: string;
+
+  @IsOptional()
+  @IsString()
+  custom_order_id?: string;
+
+  @IsOptional()
+  @IsNumber()
+  amount?: number;
+
+  @IsOptional()
+  @IsString()
+  currency?: string;
+}
+
 export class WebhookPayloadDto {
   @IsString()
   status: string;
@@ -24,24 +42,6 @@ export class WebhookPayloadDto {
 
   @IsOptional()
   metadata?: Record<string, any>;
-}
-
-export class OrderInfoDto {
-  @IsOptional()
-  @IsString()
-  order_id?: string;
-
-  @IsOptional()
-  @IsString()
-  custom_order_id?: string;
-
-  @IsOptional()
-  @IsNumber()
-  amount?: number;
-
-  @IsOptional()
-  @IsString()
-  currency?: string;
 }
 
 export class WebhookResponseDto {

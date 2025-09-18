@@ -50,7 +50,7 @@ export const authAPI = {
     firstName: string;
     lastName: string;
     role: string;
-  }) => api.post('/auth/register', userData),
+  }) => api.post('/users', userData),
   
   getProfile: () =>
     api.get('/auth/profile'),

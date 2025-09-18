@@ -140,7 +140,7 @@ export class WebhookService {
     payload: WebhookPayloadDto,
   ): Promise<void> {
     const orderStatusData = {
-      collect_id: new Types.ObjectId(order._id),
+      collect_id: new Types.ObjectId(String(order._id)),
       order_amount: payload.order_info?.amount || 0,
       transaction_amount: payload.amount || payload.order_info?.amount || 0,
       payment_mode: payload.payment_method || 'unknown',
