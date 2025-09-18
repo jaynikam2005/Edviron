@@ -251,7 +251,7 @@ const Login: React.FC = () => {
                       type="email"
                       autoComplete="email"
                       required
-                      className="input-enhanced pl-14 pr-4 py-4 text-lg"
+                      className="input-enhanced pl-16 pr-4 py-4 text-lg"
                       placeholder="Enter your email address"
                       value={formData.email}
                       onChange={handleChange}
@@ -275,7 +275,7 @@ const Login: React.FC = () => {
                       type={showPassword ? 'text' : 'password'}
                       autoComplete="current-password"
                       required
-                      className="input-enhanced pl-14 pr-14 py-4 text-lg"
+                      className="input-enhanced pl-16 pr-16 py-4 text-lg"
                       placeholder="Enter your password"
                       value={formData.password}
                       onChange={handleChange}
