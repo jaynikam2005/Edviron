@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import DashboardLayout from './components/DashboardLayout';
+import LoadingSpinner from './components/LoadingSpinner';
 
 // Lazy load components
 const Login = lazy(() => import('./pages/Login'));
@@ -30,7 +31,25 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <Router>
-          <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div></div>}>
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+              <div className="text-center">
+                <LoadingSpinner 
+                  size="xl" 
+                  type="orbital" 
+                  variant="gradient" 
+                  text="Loading Edviron..." 
+                />
+                <div className="mt-8">
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+                    <div className="w-3 h-3 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-3 h-3 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }>
             <Routes>
               {/* Public Routes */}
               <Route 
