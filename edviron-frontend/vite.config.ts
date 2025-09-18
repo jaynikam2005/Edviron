@@ -20,7 +20,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false, // Disable sourcemaps for production
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -31,6 +31,5 @@ export default defineConfig({
       },
     },
     chunkSizeWarningLimit: 1000,
-    minify: 'terser',
   },
 })
