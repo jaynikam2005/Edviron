@@ -10,11 +10,8 @@
       }
     },
     {
-      "src": "src/main.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["dist/**", "package.json", "node_modules/**"]
-      }
+      "src": "api/index.ts",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -74,12 +71,6 @@
       ]
     }
   ],
-  "functions": {
-    "api/index.ts": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  },
   "env": {
     "NODE_VERSION": "18"
   }
