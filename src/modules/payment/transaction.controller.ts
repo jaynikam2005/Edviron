@@ -5,6 +5,7 @@ import {
   Query,
   UseGuards,
   ValidationPipe,
+  Request,
 } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import {
@@ -22,16 +23,18 @@ export class TransactionController {
   @Get()
   async getAllTransactions(
     @Query(ValidationPipe) query: TransactionQueryDto,
+    @Request() req: any,
   ): Promise<PaginatedTransactionResponseDto> {
-    return this.transactionService.getAllTransactions(query);
+    return this.transactionService.getAllTransactions(query, req.user);
   }
 
   @Get('school/:schoolId')
   async getTransactionsBySchool(
     @Param('schoolId') schoolId: string,
     @Query(ValidationPipe) query: TransactionQueryDto,
+    @Request() req: any,
   ): Promise<PaginatedTransactionResponseDto> {
-    return this.transactionService.getTransactionsBySchool(schoolId, query);
+    return this.transactionService.getTransactionsBySchool(schoolId, query, req.user);
   }
 }
 
@@ -43,7 +46,8 @@ export class TransactionStatusController {
   @Get(':customOrderId')
   async getTransactionStatus(
     @Param('customOrderId') customOrderId: string,
+    @Request() req: any,
   ): Promise<TransactionStatusResponseDto> {
-    return this.transactionService.getTransactionStatus(customOrderId);
+    return this.transactionService.getTransactionStatus(customOrderId, req.user);
   }
 }

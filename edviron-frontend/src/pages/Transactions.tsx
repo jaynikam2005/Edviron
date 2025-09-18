@@ -111,6 +111,27 @@ const Transactions: React.FC = () => {
       setLoading(true);
       setError('');
       
+      // Get current user info
+      const userString = localStorage.getItem('user');
+      const currentUser = userString ? JSON.parse(userString) : null;
+      const isDemoUser = currentUser?.email === 'admin@edviron.com';
+      
+      // Only fetch real data for demo user, otherwise show empty state
+      if (!isDemoUser) {
+        setTransactions([]);
+        setPagination({
+          current_page: 1,
+          total_pages: 0,
+          total_items: 0,
+          items_per_page: 10,
+          has_next: false,
+          has_prev: false,
+        });
+        setError('Demo data is only available for the demo account (admin@edviron.com). Please login with the demo account to view sample transactions.');
+        setLoading(false);
+        return;
+      }
+      
       const apiFilters: Record<string, unknown> = {
         page: filters.page,
         limit: filters.limit,
@@ -569,9 +590,9 @@ const Transactions: React.FC = () => {
                     className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-500 ease-in-out cursor-pointer group hover:shadow-xl hover:scale-[1.02] transform-gpu backdrop-blur-sm border-l-4 border-transparent hover:border-blue-500 dark:hover:border-blue-400"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                      <div className="flex flex-col transition-all duration-500 ease-in-out group-hover:translate-x-2 group-hover:scale-105">
-                        <span className="font-mono group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all duration-500 ease-in-out group-hover:font-semibold">{transaction.custom_order_id}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-all duration-500 ease-in-out">{transaction.collect_id || transaction._id}</span>
+                      <div className="flex flex-col transition-all duration-600 ease-out group-hover:translate-x-3 group-hover:scale-105">
+                        <span className="font-mono group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all duration-600 ease-out group-hover:font-semibold">{transaction.custom_order_id}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-all duration-600 ease-out">{transaction.collect_id || transaction._id}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">

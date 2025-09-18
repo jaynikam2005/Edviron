@@ -550,18 +550,18 @@ const Dashboard: React.FC = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className="group-hover:scale-110 transition-all duration-500 ease-in-out group-hover:rotate-3">
+                        <div className="group-hover:scale-110 transition-all duration-600 ease-out group-hover:rotate-3">
                           {getStatusIcon(transaction.status)}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all duration-500 ease-in-out group-hover:font-semibold">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all duration-600 ease-out group-hover:font-semibold">
                             {transaction.custom_order_id}
                           </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-all duration-500 ease-in-out">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-all duration-600 ease-out">
                             {transaction.school_name || transaction.student_name || 'N/A'}
                           </p>
                           {/* Real-time indicator */}
-                          <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out group-hover:scale-105">
+                          <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-all duration-600 ease-out group-hover:scale-105">
                             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                             <span className="text-xs text-green-600 dark:text-green-400">Live</span>
                           </div>

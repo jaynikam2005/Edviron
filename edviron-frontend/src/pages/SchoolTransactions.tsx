@@ -58,11 +58,36 @@ const SchoolTransactions: React.FC = () => {
   ];
 
   const fetchSchoolTransactions = useCallback(async () => {
-    if (!selectedSchool) return;
-    
+    if (!selectedSchool) {
+      setError('Please select a school first');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');
+      
+      // Get current user info
+      const userString = localStorage.getItem('user');
+      const currentUser = userString ? JSON.parse(userString) : null;
+      const isDemoUser = currentUser?.email === 'admin@edviron.com';
+      
+      // Only fetch real data for demo user, otherwise show empty state
+      if (!isDemoUser) {
+        setTransactions([]);
+        setPagination({
+          current_page: 1,
+          total_pages: 0,
+          total_items: 0,
+          items_per_page: 10,
+          has_next: false,
+          has_prev: false,
+        });
+        setError('Demo data is only available for the demo account (admin@edviron.com). Please login with the demo account to view sample transactions.');
+        setLoading(false);
+        return;
+      }
       
       const response = await api.get(`/transactions/school/${selectedSchool}`, { params: filters });
       setTransactions(response.data.data || []);

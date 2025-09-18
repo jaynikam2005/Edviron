@@ -157,14 +157,89 @@ body.dark {
   100% { transform: scale(1.01) translateX(2px) rotate(0deg); }
 }
 
-@keyframes smooth-glow {
-  0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3); }
-  50% { box-shadow: 0 8px 40px rgba(59, 130, 246, 0.6); }
+/* Enhanced Ultra-Smooth Hover Effects */
+@keyframes ultra-smooth-glow {
+  0% {
+    box-shadow: 0 0 0 rgba(59, 130, 246, 0);
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px) scale(1.02);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+    transform: translateY(-3px) scale(1.03);
+  }
 }
 
-@keyframes gentle-bounce {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-2px) scale(1.05); }
+@keyframes ultra-gentle-bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-2px) scale(1.01);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.02);
+  }
+  75% {
+    transform: translateY(-2px) scale(1.01);
+  }
+}
+
+@keyframes ultra-transaction-hover {
+  0% {
+    transform: translateX(0) translateY(0) scale(1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-color: transparent;
+  }
+  33% {
+    transform: translateX(4px) translateY(-2px) scale(1.01);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  66% {
+    transform: translateX(6px) translateY(-3px) scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+  100% {
+    transform: translateX(8px) translateY(-4px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    border-color: rgba(59, 130, 246, 0.7);
+  }
+}
+
+@keyframes ultra-button-hover {
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+  }
+  100% {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  }
+}
+
+.ultra-smooth-transition {
+  transition: all 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-origin: center;
+  will-change: transform, box-shadow, border-color;
+}
+
+.ultra-smooth-button {
+  transition: all 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-origin: center;
+  will-change: transform, box-shadow, background-color;
+}
+
+.ultra-smooth-button:hover {
+  animation: ultra-button-hover 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 /* Enhanced hover effects */

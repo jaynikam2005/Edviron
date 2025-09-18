@@ -73,7 +73,29 @@ export class TransactionService {
 
   async getAllTransactions(
     query: TransactionQueryDto,
+    user?: { email?: string },
   ): Promise<PaginatedTransactionResponseDto> {
+    // Only show demo data to admin@edviron.com
+    const isDemoUser = user?.email === 'admin@edviron.com';
+    
+    if (!isDemoUser) {
+      // Return empty result for non-demo users
+      return {
+        data: [],
+        pagination: {
+          current_page: query.page || 1,
+          total_pages: 0,
+          total_items: 0,
+          items_per_page: query.limit || 10,
+          has_next: false,
+          has_prev: false,
+        },
+        sort: {
+          field: query.sort || 'payment_time',
+          order: query.order || 'desc',
+        },
+      };
+    }
     const {
       page = 1,
       limit = 10,
@@ -169,7 +191,29 @@ export class TransactionService {
   async getTransactionsBySchool(
     schoolId: string,
     query: TransactionQueryDto,
+    user?: { email?: string },
   ): Promise<PaginatedTransactionResponseDto> {
+    // Only show demo data to admin@edviron.com
+    const isDemoUser = user?.email === 'admin@edviron.com';
+    
+    if (!isDemoUser) {
+      // Return empty result for non-demo users
+      return {
+        data: [],
+        pagination: {
+          current_page: query.page || 1,
+          total_pages: 0,
+          total_items: 0,
+          items_per_page: query.limit || 10,
+          has_next: false,
+          has_prev: false,
+        },
+        sort: {
+          field: query.sort || 'payment_time',
+          order: query.order || 'desc',
+        },
+      };
+    }
     const {
       page = 1,
       limit = 10,
@@ -290,7 +334,16 @@ export class TransactionService {
 
   async getTransactionStatus(
     customOrderId: string,
+    user?: { email?: string },
   ): Promise<TransactionStatusResponseDto> {
+    // Only show demo data to admin@edviron.com
+    const isDemoUser = user?.email === 'admin@edviron.com';
+    
+    if (!isDemoUser) {
+      throw new NotFoundException(
+        `Transaction with custom_order_id '${customOrderId}' not found`,
+      );
+    }
     const pipeline = [
       {
         $match: { custom_order_id: customOrderId },
