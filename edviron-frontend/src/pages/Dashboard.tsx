@@ -74,7 +74,49 @@ const Dashboard: React.FC = () => {
     try {
       setLoading(true);
       
-      // Fetch recent transactions
+      // Get current user info
+      const userString = localStorage.getItem('user');
+      const currentUser = userString ? JSON.parse(userString) : null;
+      const isDemoUser = currentUser?.email === 'admin@edviron.com';
+      
+      // Only fetch real data for demo user, otherwise show empty state
+      if (!isDemoUser) {
+        // Show empty state for non-demo users
+        setStats({
+          totalTransactions: 0,
+          successfulPayments: 0,
+          pendingPayments: 0,
+          failedPayments: 0,
+          totalRevenue: 0,
+          monthlyRevenue: 0,
+          averageTransactionValue: 0,
+          successRate: 0,
+        });
+        setRecentTransactions([]);
+        setRecentActivity([
+          {
+            id: '1',
+            type: 'alert',
+            message: 'Welcome! This is your personal dashboard. Demo data is only available for the demo account.',
+            timestamp: new Date().toISOString(),
+            icon: 'alert',
+            color: 'blue',
+          },
+          {
+            id: '2',
+            type: 'user',
+            message: 'Start by creating your first payment or transaction.',
+            timestamp: new Date().toISOString(),
+            icon: 'user',
+            color: 'green',
+          }
+        ]);
+        setError('');
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch recent transactions only for demo user
       const transactionsResponse = await api.get('/transactions', {
         params: {
           page: 1,
@@ -504,22 +546,22 @@ const Dashboard: React.FC = () => {
                 recentTransactions.map((transaction) => (
                   <div 
                     key={transaction._id} 
-                    className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:scale-[1.01] transform-gpu border-l-4 border-transparent hover:border-blue-500"
+                    className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-500 ease-in-out cursor-pointer group hover:shadow-xl hover:scale-[1.02] transform-gpu border-l-4 border-transparent hover:border-blue-500 dark:hover:border-blue-400 rounded-lg hover:backdrop-blur-sm"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className="group-hover:scale-110 transition-transform duration-300">
+                        <div className="group-hover:scale-110 transition-all duration-500 ease-in-out group-hover:rotate-3">
                           {getStatusIcon(transaction.status)}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all duration-500 ease-in-out group-hover:font-semibold">
                             {transaction.custom_order_id}
                           </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-all duration-500 ease-in-out">
                             {transaction.school_name || transaction.student_name || 'N/A'}
                           </p>
                           {/* Real-time indicator */}
-                          <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out group-hover:scale-105">
                             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                             <span className="text-xs text-green-600 dark:text-green-400">Live</span>
                           </div>

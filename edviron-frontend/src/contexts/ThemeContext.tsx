@@ -23,20 +23,22 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem('theme', theme);
       const root = document.documentElement;
+      const body = document.body;
       
-      // Remove existing dark class first
+      // Remove existing dark class first from both elements
       root.classList.remove('dark');
+      body.classList.remove('dark');
       
-      // Add dark class if needed
+      // Add dark class if needed to both elements
       if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         root.classList.add('dark');
+        body.classList.add('dark');
       }
       
-      // Force a repaint by triggering a style recalculation
-      root.style.display = 'none';
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      root.offsetHeight; // Trigger reflow
-      root.style.display = '';
+      // Apply theme attributes for better CSS targeting
+      root.setAttribute('data-theme', theme);
+      body.setAttribute('data-theme', theme);
+      
     } catch (err) {
       console.error('Failed to persist theme', err);
     }

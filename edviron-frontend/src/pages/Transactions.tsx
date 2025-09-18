@@ -150,13 +150,30 @@ const Transactions: React.FC = () => {
 
       if (filters.dateFrom || filters.dateTo) {
         data = data.filter((t: Transaction) => {
-          const transactionDate = new Date(t.payment_time || t.order_created_at);
-          const fromDate = filters.dateFrom ? new Date(filters.dateFrom) : null;
-          const toDate = filters.dateTo ? new Date(filters.dateTo + 'T23:59:59') : null;
-          
-          if (fromDate && transactionDate < fromDate) return false;
-          if (toDate && transactionDate > toDate) return false;
-          return true;
+          try {
+            // Safely handle date parsing with null checks
+            const dateString = t.payment_time || t.order_created_at;
+            if (!dateString) return false;
+            
+            const transactionDate = new Date(dateString);
+            
+            // Check if date is valid
+            if (isNaN(transactionDate.getTime())) return false;
+            
+            const fromDate = filters.dateFrom ? new Date(filters.dateFrom) : null;
+            const toDate = filters.dateTo ? new Date(filters.dateTo + 'T23:59:59') : null;
+            
+            // Check if parsed dates are valid
+            if (fromDate && isNaN(fromDate.getTime())) return true;
+            if (toDate && isNaN(toDate.getTime())) return true;
+            
+            if (fromDate && transactionDate < fromDate) return false;
+            if (toDate && transactionDate > toDate) return false;
+            return true;
+          } catch (error) {
+            console.warn('Date filtering error:', error);
+            return true; // Include transaction if date parsing fails
+          }
         });
       }
 
@@ -549,22 +566,22 @@ const Transactions: React.FC = () => {
                 transactions.map((transaction) => (
                   <tr 
                     key={transaction._id} 
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:scale-[1.02] transform-gpu"
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-500 ease-in-out cursor-pointer group hover:shadow-xl hover:scale-[1.02] transform-gpu backdrop-blur-sm border-l-4 border-transparent hover:border-blue-500 dark:hover:border-blue-400"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                      <div className="flex flex-col transition-all duration-300 group-hover:translate-x-1">
-                        <span className="font-mono group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">{transaction.custom_order_id}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">{transaction.collect_id || transaction._id}</span>
+                      <div className="flex flex-col transition-all duration-500 ease-in-out group-hover:translate-x-2 group-hover:scale-105">
+                        <span className="font-mono group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all duration-500 ease-in-out group-hover:font-semibold">{transaction.custom_order_id}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-all duration-500 ease-in-out">{transaction.collect_id || transaction._id}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                      <div className="flex flex-col transition-all duration-300 group-hover:translate-x-1">
-                        <span className="font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">{transaction.school_id}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">{transaction.trustee_id}</span>
+                      <div className="flex flex-col transition-all duration-500 ease-in-out group-hover:translate-x-2 group-hover:scale-105">
+                        <span className="font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-all duration-500 ease-in-out group-hover:font-semibold">{transaction.school_id}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-all duration-500 ease-in-out">{transaction.trustee_id}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                      <span className="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded dark:bg-gray-700 dark:text-gray-300 transition-all duration-300 group-hover:bg-blue-100 group-hover:text-blue-800 dark:group-hover:bg-blue-900 dark:group-hover:text-blue-300 group-hover:scale-105 transform-gpu group-hover:shadow-md">
+                      <span className="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded dark:bg-gray-700 dark:text-gray-300 transition-all duration-500 ease-in-out group-hover:bg-blue-100 group-hover:text-blue-800 dark:group-hover:bg-blue-900 dark:group-hover:text-blue-300 group-hover:scale-110 transform-gpu group-hover:shadow-lg group-hover:rotate-1">
                         {transaction.gateway_name || 'N/A'}
                       </span>
                     </td>
@@ -572,17 +589,17 @@ const Transactions: React.FC = () => {
                       <span className="font-medium">₹{transaction.order_amount?.toLocaleString() || '0'}</span>
                     </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                      <div className="flex flex-col transition-all duration-300">
-                        <span className="font-medium group-hover:text-green-600 dark:group-hover:text-green-400 group-hover:font-bold transition-all duration-300 group-hover:scale-110 transform-gpu">₹{transaction.order_amount?.toLocaleString() || '0'}</span>
+                      <div className="flex flex-col transition-all duration-500 ease-in-out">
+                        <span className="font-medium group-hover:text-green-600 dark:group-hover:text-green-400 group-hover:font-bold transition-all duration-500 ease-in-out group-hover:scale-125 transform-gpu group-hover:drop-shadow-lg animate-pulse group-hover:animate-bounce">₹{transaction.order_amount?.toLocaleString() || '0'}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                      <div className="flex flex-col transition-all duration-300">
-                        <span className="font-medium group-hover:text-green-600 dark:group-hover:text-green-400 group-hover:font-bold transition-all duration-300 group-hover:scale-110 transform-gpu">₹{transaction.transaction_amount?.toLocaleString() || '0'}</span>
+                      <div className="flex flex-col transition-all duration-500 ease-in-out">
+                        <span className="font-medium group-hover:text-green-600 dark:group-hover:text-green-400 group-hover:font-bold transition-all duration-500 ease-in-out group-hover:scale-125 transform-gpu group-hover:drop-shadow-lg animate-pulse group-hover:animate-bounce">₹{transaction.transaction_amount?.toLocaleString() || '0'}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`${getStatusBadge(transaction.status)} transition-all duration-300 group-hover:shadow-md group-hover:scale-110 transform-gpu group-hover:ring-2 group-hover:ring-offset-1 ${getStatusHoverRing(transaction.status)}`}>
+                      <span className={`${getStatusBadge(transaction.status)} transition-all duration-500 ease-in-out group-hover:shadow-xl group-hover:scale-125 transform-gpu group-hover:ring-4 group-hover:ring-offset-2 ${getStatusHoverRing(transaction.status)} group-hover:animate-pulse`}>
                         {transaction.status || 'Unknown'}
                       </span>
                     </td>

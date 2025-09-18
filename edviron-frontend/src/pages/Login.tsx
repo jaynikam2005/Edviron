@@ -57,9 +57,9 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex relative overflow-hidden">
+    <div className="h-screen flex relative overflow-hidden bg-white dark:bg-gray-900">
       {/* Animated Background */}
-      <div className="absolute inset-0 gradient-animated opacity-20"></div>
+      <div className="absolute inset-0 gradient-animated opacity-20 dark:opacity-30"></div>
       
       {/* Floating Particles */}
       <div className="absolute inset-0 pointer-events-none">
