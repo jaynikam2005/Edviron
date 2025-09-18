@@ -58,7 +58,7 @@ function createOrderStatus(order, createdOrder, student, school, i) {
   };
 }
 
-async function generateOrders() {
+async function generateOrders(demoUserId) {
   const schools = [
     { name: 'Delhi Public School', id: 'DPS001' },
     { name: 'Kendriya Vidyalaya', id: 'KV002' },
@@ -68,45 +68,47 @@ async function generateOrders() {
     { name: 'Bal Bharati School', id: 'BB006' },
   ];
 
-  const paymentModes = [
-    'UPI',
-    'Credit Card',
-    'Debit Card',
-    'Net Banking',
-    'Wallet',
+  const students = [
+    'Rahul Sharma',
+    'Priya Patel',
+    'Arjun Kumar',
+    'Sneha Gupta',
+    'Vikram Singh',
+    'Ananya Reddy',
+    'Karan Mehta',
+    'Isha Verma',
+    'Aditya Joshi',
+    'Kavya Nair',
+    'Rohit Agarwal',
+    'Neha Mishra',
   ];
-  const statuses = ['success', 'pending', 'failed'];
-  const amounts = [500, 1000, 1500, 2000, 2500, 3000, 5000, 7500, 10000];
 
   const orders = [];
+
   for (let i = 0; i < 80; i++) {
     const school = schools[Math.floor(Math.random() * schools.length)];
-    const paymentMode =
-      paymentModes[Math.floor(Math.random() * paymentModes.length)];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const amount = amounts[Math.floor(Math.random() * amounts.length)];
+    const student = students[i % students.length];
 
-    const now = new Date();
-    const pastDate = new Date(
-      now.getTime() - Math.random() * 30 * 24 * 60 * 60 * 1000,
-    );
-
+    // Create order record (matching new schema)
     const order = {
       school_id: school.id,
       trustee_id: 'TRUSTEE_001',
       custom_order_id: `ORD${String(i + 1).padStart(6, '0')}`,
-      gateway_name: 'Edviron Gateway',
-      order_amount: amount,
-      transaction_amount: status === 'failed' ? 0 : amount,
-      payment_mode: paymentMode,
-      status: status,
-      payment_time: pastDate,
+      gateway_name: 'edviron',
+      student_info: {
+        name: student,
+        id: `STU${String(i + 1).padStart(6, '0')}`,
+        email: `${student.toLowerCase().replace(' ', '.')}@school.edu`,
+        class: `Class ${Math.floor(Math.random() * 12) + 1}`,
+        section: String.fromCharCode(65 + Math.floor(Math.random() * 4)) // A, B, C, D
+      },
+      created_by: demoUserId, // Associate with demo user
     };
 
     orders.push(order);
   }
 
-  return { orders, schools };
+  return { orders, schools, students };
 }
 
 // Simple demo data seeder using direct MongoDB connection
@@ -114,24 +116,43 @@ async function seedDemoData() {
   console.log('🌱 Starting demo data seeding...');
 
   try {
-    // Connect to MongoDB (use environment variable for production)
-    const MONGODB_URI = process.env.MONGODB_URI ||
-      'mongodb://localhost:27017/edviron_demo';
+    // Connect to MongoDB - use the same URI as the demo user script
+    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://edviron_user:Jaynikam2@edviron-cluster.04dfzfx.mongodb.net/?retryWrites=true&w=majority&appName=edviron-cluster';
     await mongoose.connect(MONGODB_URI);
     console.log('✅ Connected to MongoDB');
 
-    // Define schemas
+    // First, verify the demo user exists
+    const UserSchema = new mongoose.Schema({
+      email: String,
+      username: String,
+      _id: mongoose.Schema.Types.ObjectId
+    });
+    const User = mongoose.model('User', UserSchema);
+    
+    const demoUser = await User.findOne({ email: 'admin@edviron.com' });
+    if (!demoUser) {
+      console.log('❌ Demo user not found! Please run create-demo-user.js first.');
+      return;
+    }
+    console.log('✅ Found demo user:', demoUser.email);
+
+    // Define schemas with proper structure matching the application
     const OrderSchema = new mongoose.Schema({
       school_id: String,
       trustee_id: String,
-      custom_order_id: String,
+      custom_order_id: { type: String, unique: true },
       gateway_name: String,
-      order_amount: Number,
-      transaction_amount: Number,
-      payment_mode: String,
-      status: String,
-      payment_time: Date,
-    });
+      student_info: {
+        name: String,
+        id: String,
+        email: String,
+        class: String,
+        section: String
+      },
+      created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Associate with demo user
+      createdAt: { type: Date, default: Date.now },
+      updatedAt: { type: Date, default: Date.now }
+    }, { timestamps: true });
 
     const OrderStatusSchema = new mongoose.Schema({
       collect_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
@@ -161,10 +182,10 @@ async function seedDemoData() {
     const Order = mongoose.model('Order', OrderSchema);
     const OrderStatus = mongoose.model('OrderStatus', OrderStatusSchema);
 
-    // Clear existing demo data
-    await Order.deleteMany({});
+    // Clear existing demo data (only for demo user)
+    await Order.deleteMany({ created_by: demoUser._id });
     await OrderStatus.deleteMany({});
-    console.log('🗑️ Cleared existing data');
+    console.log('🗑️ Cleared existing demo data for demo user');
 
     const students = [
       'Rahul Sharma',
@@ -183,7 +204,7 @@ async function seedDemoData() {
 
     // Generate and insert orders
     console.log('📦 Creating demo orders...');
-    const { orders, schools } = await generateOrders();
+    const { orders, schools } = await generateOrders(demoUser._id);
 
     const createdOrders = await Order.insertMany(orders);
     console.log(`✅ Created ${createdOrders.length} demo orders`);
