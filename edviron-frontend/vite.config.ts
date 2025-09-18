@@ -32,14 +32,5 @@ export default defineConfig({
     },
     chunkSizeWarningLimit: 1000,
     minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.logs in production
-        drop_debugger: true,
-      },
-    },
-  },
-  define: {
-    __DEV__: JSON.stringify(false),
   },
 })
