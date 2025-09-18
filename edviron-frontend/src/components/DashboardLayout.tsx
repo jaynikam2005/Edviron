@@ -139,7 +139,7 @@ const DashboardLayout: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 flex">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
@@ -152,15 +152,17 @@ const DashboardLayout: React.FC = () => {
         </div>
       )}
 
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+      {/* Sidebar - Full Height */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 sidebar-responsive bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 lg:flex lg:flex-col h-full ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="flex items-center justify-center h-16 px-4 bg-primary-600 dark:bg-primary-700">
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-center h-16 px-4 bg-primary-600 dark:bg-primary-700 flex-shrink-0">
           <h1 className="text-xl font-bold text-white">Edviron</h1>
         </div>
         
-        <nav className="mt-8 px-4">
+        {/* Sidebar Navigation - Scrollable */}
+        <nav className="flex-1 overflow-y-auto py-4 px-4 custom-scrollbar">
           <ul className="space-y-2">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href || 
@@ -187,10 +189,10 @@ const DashboardLayout: React.FC = () => {
         </nav>
       </div>
 
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top navbar */}
-        <div className="sticky top-0 z-40 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      {/* Main content area - Full Height */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top navbar - Fixed Height */}
+        <div className="flex-shrink-0 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
             <div className="flex items-center">
               <button
@@ -267,10 +269,10 @@ const DashboardLayout: React.FC = () => {
           </div>
         </div>
 
-        {/* Page content */}
-        <main className="flex-1">
-          <div className="py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Page content - Scrollable */}
+        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 custom-scrollbar">
+          <div className="h-full">
+            <div className="max-w-none mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-full">
               <Outlet />
             </div>
           </div>

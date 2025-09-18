@@ -257,7 +257,7 @@ const Transactions: React.FC = () => {
     return `${filters.statuses.length} statuses selected`;
   };
   return (
-    <div className="space-y-6">
+    <div className="h-full space-y-6 overflow-y-auto custom-scrollbar">
       {/* Header */}
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>

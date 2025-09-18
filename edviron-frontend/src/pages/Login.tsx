@@ -57,7 +57,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex relative overflow-hidden">
+    <div className="h-screen flex relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 gradient-animated opacity-20"></div>
       

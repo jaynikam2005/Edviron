@@ -52,8 +52,51 @@ body {
   font-weight: 400;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Ensure full height for root elements */
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Improved responsive design */
+@media (max-width: 1024px) {
+  .sidebar-responsive {
+    width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-responsive {
+    width: 280px;
+  }
+}
+
+/* Better scrollbar for content areas */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--border-secondary);
 }
 
 /* Enhanced animations */
