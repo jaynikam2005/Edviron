@@ -66,10 +66,10 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       <Router>
         <Suspense fallback={
-          <div className="flex items-center justify-center h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
+          <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
             <div className="text-center">
               <LoadingSpinner 
                 size="xl" 

@@ -15,6 +15,14 @@ import {
 } from '../../dto/transaction-query.dto';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
+interface AuthenticatedRequest {
+  user: {
+    userId?: string;
+    email?: string;
+    role?: string;
+  };
+}
+
 @Controller('transactions')
 @UseGuards(JwtAuthGuard)
 export class TransactionController {
@@ -23,7 +31,7 @@ export class TransactionController {
   @Get()
   async getAllTransactions(
     @Query(ValidationPipe) query: TransactionQueryDto,
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
   ): Promise<PaginatedTransactionResponseDto> {
     return this.transactionService.getAllTransactions(query, req.user);
   }
@@ -32,7 +40,7 @@ export class TransactionController {
   async getTransactionsBySchool(
     @Param('schoolId') schoolId: string,
     @Query(ValidationPipe) query: TransactionQueryDto,
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
   ): Promise<PaginatedTransactionResponseDto> {
     return this.transactionService.getTransactionsBySchool(schoolId, query, req.user);
   }
@@ -46,7 +54,7 @@ export class TransactionStatusController {
   @Get(':customOrderId')
   async getTransactionStatus(
     @Param('customOrderId') customOrderId: string,
-    @Request() req: any,
+    @Request() req: AuthenticatedRequest,
   ): Promise<TransactionStatusResponseDto> {
     return this.transactionService.getTransactionStatus(customOrderId, req.user);
   }

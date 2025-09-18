@@ -73,13 +73,14 @@ export class TransactionService {
 
   async getAllTransactions(
     query: TransactionQueryDto,
-    user?: { email?: string },
+    user?: { email?: string; userId?: string; role?: string },
   ): Promise<PaginatedTransactionResponseDto> {
-    // Only show demo data to admin@edviron.com
+    // Check if user is the demo user
     const isDemoUser = user?.email === 'admin@edviron.com';
     
+    // For non-demo users, return empty results
     if (!isDemoUser) {
-      // Return empty result for non-demo users
+      this.logger.log(`Non-demo user ${user?.email || 'unknown'} attempted to access transactions`);
       return {
         data: [],
         pagination: {
@@ -96,6 +97,9 @@ export class TransactionService {
         },
       };
     }
+    
+    // Demo user - show all data
+    this.logger.log(`Demo user ${user?.email} accessing transactions`);
     const {
       page = 1,
       limit = 10,
@@ -191,13 +195,14 @@ export class TransactionService {
   async getTransactionsBySchool(
     schoolId: string,
     query: TransactionQueryDto,
-    user?: { email?: string },
+    user?: { email?: string; userId?: string; role?: string },
   ): Promise<PaginatedTransactionResponseDto> {
-    // Only show demo data to admin@edviron.com
+    // Check if user is the demo user
     const isDemoUser = user?.email === 'admin@edviron.com';
     
+    // For non-demo users, return empty results
     if (!isDemoUser) {
-      // Return empty result for non-demo users
+      this.logger.log(`Non-demo user ${user?.email || 'unknown'} attempted to access school transactions for ${schoolId}`);
       return {
         data: [],
         pagination: {
@@ -214,6 +219,9 @@ export class TransactionService {
         },
       };
     }
+    
+    // Demo user - show all data
+    this.logger.log(`Demo user ${user?.email} accessing school transactions for ${schoolId}`);
     const {
       page = 1,
       limit = 10,
@@ -334,16 +342,21 @@ export class TransactionService {
 
   async getTransactionStatus(
     customOrderId: string,
-    user?: { email?: string },
+    user?: { email?: string; userId?: string; role?: string },
   ): Promise<TransactionStatusResponseDto> {
-    // Only show demo data to admin@edviron.com
+    // Check if user is the demo user
     const isDemoUser = user?.email === 'admin@edviron.com';
     
+    // For non-demo users, deny access
     if (!isDemoUser) {
+      this.logger.log(`Non-demo user ${user?.email || 'unknown'} attempted to access transaction status for ${customOrderId}`);
       throw new NotFoundException(
         `Transaction with custom_order_id '${customOrderId}' not found`,
       );
     }
+    
+    // Demo user - proceed with normal logic
+    this.logger.log(`Demo user ${user?.email} accessing transaction status for ${customOrderId}`);
     const pipeline = [
       {
         $match: { custom_order_id: customOrderId },
@@ -394,12 +407,12 @@ export class TransactionService {
     }
 
     const safeGet = (
-      obj: any,
+      obj: unknown,
       key: string,
-      defaultValue: any = undefined,
-    ): any => {
-      return obj && typeof obj === 'object' && key in obj
-        ? (obj as Record<string, any>)[key]
+      defaultValue: unknown = undefined,
+    ): unknown => {
+      return obj && typeof obj === 'object' && obj !== null && key in obj
+        ? (obj as Record<string, unknown>)[key]
         : defaultValue;
     };
 
