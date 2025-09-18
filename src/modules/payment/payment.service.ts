@@ -5,7 +5,10 @@ import { Model } from 'mongoose';
 import * as jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { Order, OrderDocument } from '../../schemas/order.schema';
-import { CreatePaymentDto, PaymentResponseDto } from '../../dto/create-payment.dto';
+import {
+  CreatePaymentDto,
+  PaymentResponseDto,
+} from '../../dto/create-payment.dto';
 
 @Injectable()
 export class PaymentService {
@@ -16,7 +19,9 @@ export class PaymentService {
     private readonly configService: ConfigService,
   ) {}
 
-  async createPayment(createPaymentDto: CreatePaymentDto): Promise<PaymentResponseDto> {
+  async createPayment(
+    createPaymentDto: CreatePaymentDto,
+  ): Promise<PaymentResponseDto> {
     try {
       // Generate custom order ID
       const customOrderId = this.generateOrderId();
@@ -33,7 +38,10 @@ export class PaymentService {
       // Sign JWT with pg_key
       const pgKey = this.configService.get<string>('payment.pgKey');
       if (!pgKey) {
-        throw new HttpException('Payment gateway key not configured', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          'Payment gateway key not configured',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
       const signedToken = jwt.sign(jwtPayload, pgKey, { expiresIn: '1h' });
@@ -43,11 +51,14 @@ export class PaymentService {
       const baseUrl = this.configService.get<string>('payment.baseUrl');
 
       if (!apiKey) {
-        throw new HttpException('Payment API key not configured', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          'Payment API key not configured',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
       const apiUrl = `${baseUrl}/erp/create-collect-request`;
-      
+
       // Call Edviron Create Collect Request API
       const apiResponse = await axios.post(
         apiUrl,
@@ -59,11 +70,11 @@ export class PaymentService {
         },
         {
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
+            Authorization: `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
           },
           timeout: 30000, // 30 seconds timeout
-        }
+        },
       );
 
       this.logger.log(`API Response Status: ${apiResponse.status}`);
@@ -86,9 +97,10 @@ export class PaymentService {
       this.logger.log(`Order saved with ID: ${savedOrder._id}`);
 
       // Extract payment link from API response
-      const collectRequestUrl = apiResponse.data?.collect_request_url || 
-                               apiResponse.data?.payment_link ||
-                               apiResponse.data?.url;
+      const collectRequestUrl =
+        apiResponse.data?.collect_request_url ||
+        apiResponse.data?.payment_link ||
+        apiResponse.data?.url;
 
       if (!collectRequestUrl) {
         this.logger.warn('No payment URL found in API response');
@@ -101,16 +113,17 @@ export class PaymentService {
         payment_link: collectRequestUrl,
         collect_request_url: collectRequestUrl,
       };
-
     } catch (error) {
       this.logger.error('Error creating payment:', error);
-      
+
       if (axios.isAxiosError(error)) {
         const status = error.response?.status || HttpStatus.BAD_GATEWAY;
         const message = error.response?.data?.message || 'External API error';
         throw new HttpException(
           `Payment gateway error: ${message}`,
-          status >= 400 && status < 500 ? HttpStatus.BAD_REQUEST : HttpStatus.BAD_GATEWAY
+          status >= 400 && status < 500
+            ? HttpStatus.BAD_REQUEST
+            : HttpStatus.BAD_GATEWAY,
         );
       }
 
@@ -120,14 +133,16 @@ export class PaymentService {
 
       throw new HttpException(
         'Internal server error while creating payment',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
   private generateOrderId(): string {
     const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const random = Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, '0');
     return `ORD_${timestamp}_${random}`;
   }
 

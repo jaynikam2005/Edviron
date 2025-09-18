@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsObject, IsOptional, IsString, IsDateString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsDateString,
+} from 'class-validator';
 
 export class CreateWebhookLogsDto {
   @IsObject()

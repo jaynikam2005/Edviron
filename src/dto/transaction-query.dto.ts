@@ -1,4 +1,11 @@
-import { IsOptional, IsString, IsNumber, Min, Max, IsIn } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  Min,
+  Max,
+  IsIn,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
 export class TransactionQueryDto {
@@ -25,7 +32,7 @@ export class TransactionQueryDto {
     'transaction_amount',
     'status',
     'school_id',
-    'custom_order_id'
+    'custom_order_id',
   ])
   sort?: string = 'payment_time';
 

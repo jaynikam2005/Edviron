@@ -12,7 +12,10 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.findByEmail(email);
-    if (user && await this.userService.validatePassword(password, user.password)) {
+    if (
+      user &&
+      (await this.userService.validatePassword(password, user.password))
+    ) {
       const { password, ...result } = user.toObject();
       return result;
     }
@@ -26,7 +29,7 @@ export class AuthService {
     }
 
     const payload = { email: user.email, sub: user._id, role: user.role };
-    
+
     // Update last login
     await this.userService.updateLastLogin(user._id);
 

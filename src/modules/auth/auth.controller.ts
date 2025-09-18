@@ -43,7 +43,11 @@ export class AuthController {
   @Post('login-guard')
   async loginWithGuard(@Request() req) {
     // This endpoint uses the LocalAuthGuard for validation
-    const payload = { email: req.user.email, sub: req.user._id, role: req.user.role };
+    const payload = {
+      email: req.user.email,
+      sub: req.user._id,
+      role: req.user.role,
+    };
     return {
       access_token: this.authService['jwtService'].sign(payload),
       user: req.user,

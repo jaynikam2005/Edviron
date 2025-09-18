@@ -22,7 +22,9 @@ export class UserController {
   async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
     // Remove password from response
-    const userObj = (user as { toObject(): Record<string, unknown> }).toObject();
+    const userObj = (
+      user as { toObject(): Record<string, unknown> }
+    ).toObject();
     const { password, ...result } = userObj;
     return result;
   }
