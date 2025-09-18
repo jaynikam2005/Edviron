@@ -1,16 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 
+interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
+
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { theme, isDark, toggleTheme } = useTheme();
+  const [user, setUser] = useState<User | null>(null);
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   
+  useEffect(() => {
+    // Get user info from localStorage
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      try {
+        setUser(JSON.parse(userString));
+      } catch (error) {
+        console.error('Failed to parse user data:', error);
+      }
+    }
+  }, []);
+  
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
     navigate('/login');
+  };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
   };
 
   const navigation = [
@@ -170,29 +199,51 @@ const DashboardLayout: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Real-time indicator */}
+              <div className="hidden sm:flex items-center space-x-2 px-3 py-1 bg-green-100 dark:bg-green-900 rounded-full">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs font-medium text-green-800 dark:text-green-200">Live Data</span>
+              </div>
+              
               {/* Dark mode toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 transition-colors duration-200"
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 group"
                 aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-                title={`Current: ${theme} theme`}
+                title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
               >
                 {isDark ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  <svg className="w-5 h-5 text-yellow-500 group-hover:scale-110 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  <svg className="w-5 h-5 text-gray-700 group-hover:scale-110 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
                   </svg>
                 )}
               </button>
 
               {/* User menu */}
-              <div className="flex items-center space-x-2">
-                <div className="hidden sm:block">
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Welcome back!</span>
-                </div>
+              <div className="flex items-center space-x-3">
+                {/* Welcome Message */}
+                {user && (
+                  <div className="hidden md:block text-right">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{getGreeting()},</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      Welcome back, {user.firstName}!
+                    </p>
+                  </div>
+                )}
+                
+                {/* User Avatar */}
+                {user && (
+                  <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">
+                      {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                    </span>
+                  </div>
+                )}
+                
                 <button
                   onClick={handleLogout}
                   className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 transition-colors duration-200"

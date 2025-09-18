@@ -29,9 +29,13 @@ async function bootstrap() {
 
   // Configure CORS with security options
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || [
+    origin: process.env.CORS_ORIGIN?.split(',') || [
       'http://localhost:3000',
       'http://localhost:3001',
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:5175',
+      'http://localhost:5176',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],

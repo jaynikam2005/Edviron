@@ -8,9 +8,12 @@ const api = axios.create({
   },
 });
 
+console.log('API Base URL:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000');
+
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
+    console.log('Making API request:', config.method?.toUpperCase(), config.url);
     const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -18,14 +21,19 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('Request error:', error);
     return Promise.reject(new Error(`Request failed: ${error.message}`));
   }
 );
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API response success:', response.status, response.config.url);
+    return response;
+  },
   (error) => {
+    console.error('API response error:', error.response?.status, error.response?.data, error.message);
     if (error.response?.status === 401) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('token');
