@@ -30,9 +30,21 @@ const DashboardLayout: React.FC = () => {
   }, []);
   
   const handleLogout = () => {
+    // Clear all authentication data
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem('theme'); // Also clear theme to reset
+    
+    // Clear any session storage
+    sessionStorage.clear();
+    
+    // Force navigate to login and reload page to reset state
+    navigate('/login', { replace: true });
+    
+    // Force page reload to completely reset application state
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 100);
   };
 
   const getGreeting = () => {

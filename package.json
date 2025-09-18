@@ -19,7 +19,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "init-db": "ts-node src/scripts/init-db.ts",
-    "seed-demo": "node src/scripts/seed-demo-data.js"
+    "seed-demo": "node src/scripts/seed-demo-data.js",
+    "create-demo-user": "node src/scripts/create-demo-user.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

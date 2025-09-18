@@ -504,38 +504,38 @@ const Dashboard: React.FC = () => {
                 recentTransactions.map((transaction) => (
                   <div 
                     key={transaction._id} 
-                    className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer group hover:shadow-md hover:scale-[1.01] transform"
+                    className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:scale-[1.01] transform-gpu border-l-4 border-transparent hover:border-blue-500"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className="group-hover:scale-110 transition-transform duration-200">
+                        <div className="group-hover:scale-110 transition-transform duration-300">
                           {getStatusIcon(transaction.status)}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                             {transaction.custom_order_id}
                           </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
                             {transaction.school_name || transaction.student_name || 'N/A'}
                           </p>
                           {/* Real-time indicator */}
-                          <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                             <span className="text-xs text-green-600 dark:text-green-400">Live</span>
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-all duration-300 group-hover:font-bold group-hover:scale-105 transform-gpu">
                           ₹{transaction.transaction_amount?.toLocaleString()}
                         </p>
                         <div className="flex items-center space-x-2">
-                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full transition-all duration-200 group-hover:shadow-md ${getStatusClass(transaction.status)}`}>
+                          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full transition-all duration-300 group-hover:shadow-md group-hover:scale-105 transform-gpu ${getStatusClass(transaction.status)}`}>
                             {transaction.status}
                           </span>
                         </div>
                         {/* Last updated indicator */}
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           Updated: {lastUpdate.toLocaleTimeString()}
                         </p>
                       </div>

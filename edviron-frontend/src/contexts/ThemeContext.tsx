@@ -6,7 +6,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [theme, setTheme] = useState<ThemeName>(() => {
     try {
       const stored = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
-      return (stored as ThemeName) || 'light';
+      if (stored && ['light', 'dark', 'system'].includes(stored)) {
+        return stored as ThemeName;
+      }
+      return 'light'; // Default to light theme
     } catch {
       return 'light';
     }
@@ -20,11 +23,20 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem('theme', theme);
       const root = document.documentElement;
+      
+      // Remove existing dark class first
+      root.classList.remove('dark');
+      
+      // Add dark class if needed
       if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
       }
+      
+      // Force a repaint by triggering a style recalculation
+      root.style.display = 'none';
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      root.offsetHeight; // Trigger reflow
+      root.style.display = '';
     } catch (err) {
       console.error('Failed to persist theme', err);
     }

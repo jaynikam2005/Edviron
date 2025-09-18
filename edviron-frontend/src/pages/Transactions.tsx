@@ -205,6 +205,19 @@ const Transactions: React.FC = () => {
     return `inline-flex px-2 py-1 text-xs font-semibold rounded-full ${colorMap[colorClass as keyof typeof colorMap]}`;
   };
 
+  const getStatusHoverRing = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'success':
+        return 'group-hover:ring-green-300';
+      case 'pending':
+        return 'group-hover:ring-yellow-300';
+      case 'failed':
+        return 'group-hover:ring-red-300';
+      default:
+        return 'group-hover:ring-gray-300';
+    }
+  };
+
   const getSortIcon = (column: string) => {
     if (filters.sortBy !== column) {
       return (
@@ -536,45 +549,52 @@ const Transactions: React.FC = () => {
                 transactions.map((transaction) => (
                   <tr 
                     key={transaction._id} 
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 cursor-pointer"
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 cursor-pointer group hover:shadow-lg hover:scale-[1.02] transform-gpu"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                      <div className="flex flex-col">
-                        <span className="font-mono">{transaction.custom_order_id}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">{transaction.collect_id || transaction._id}</span>
+                      <div className="flex flex-col transition-all duration-300 group-hover:translate-x-1">
+                        <span className="font-mono group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">{transaction.custom_order_id}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">{transaction.collect_id || transaction._id}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                      <div className="flex flex-col">
-                        <span className="font-medium">{transaction.school_id}</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">{transaction.trustee_id}</span>
+                      <div className="flex flex-col transition-all duration-300 group-hover:translate-x-1">
+                        <span className="font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">{transaction.school_id}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">{transaction.trustee_id}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                      <span className="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded dark:bg-gray-700 dark:text-gray-300">
+                      <span className="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded dark:bg-gray-700 dark:text-gray-300 transition-all duration-300 group-hover:bg-blue-100 group-hover:text-blue-800 dark:group-hover:bg-blue-900 dark:group-hover:text-blue-300 group-hover:scale-105 transform-gpu group-hover:shadow-md">
                         {transaction.gateway_name || 'N/A'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                       <span className="font-medium">₹{transaction.order_amount?.toLocaleString() || '0'}</span>
                     </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                      <div className="flex flex-col transition-all duration-300">
+                        <span className="font-medium group-hover:text-green-600 dark:group-hover:text-green-400 group-hover:font-bold transition-all duration-300 group-hover:scale-110 transform-gpu">₹{transaction.order_amount?.toLocaleString() || '0'}</span>
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                      <span className="font-medium">₹{transaction.transaction_amount?.toLocaleString() || '0'}</span>
+                      <div className="flex flex-col transition-all duration-300">
+                        <span className="font-medium group-hover:text-green-600 dark:group-hover:text-green-400 group-hover:font-bold transition-all duration-300 group-hover:scale-110 transform-gpu">₹{transaction.transaction_amount?.toLocaleString() || '0'}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={getStatusBadge(transaction.status)}>
+                      <span className={`${getStatusBadge(transaction.status)} transition-all duration-300 group-hover:shadow-md group-hover:scale-110 transform-gpu group-hover:ring-2 group-hover:ring-offset-1 ${getStatusHoverRing(transaction.status)}`}>
                         {transaction.status || 'Unknown'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                      <div className="flex flex-col">
-                        <span>
+                      <div className="flex flex-col transition-all duration-300 group-hover:translate-x-1">
+                        <span className="group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:font-medium transition-all duration-300">
                           {transaction.payment_time 
                             ? new Date(transaction.payment_time).toLocaleDateString()
                             : new Date(transaction.order_created_at).toLocaleDateString()
                           }
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
                           {transaction.payment_time 
                             ? new Date(transaction.payment_time).toLocaleTimeString()
                             : new Date(transaction.order_created_at).toLocaleTimeString()

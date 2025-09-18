@@ -25,7 +25,14 @@ const Reports = lazy(() => import('./pages/Reports'));
 import './App.css';
 
 function App() {
-  const isAuthenticated = !!localStorage.getItem('accessToken');
+  // Check if user has a valid token but require re-authentication anyway
+  const hasStoredToken = !!localStorage.getItem('accessToken');
+  
+  // Clear any existing authentication on app load to force fresh login
+  if (hasStoredToken) {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+  }
 
   return (
     <ErrorBoundary>
@@ -51,20 +58,20 @@ function App() {
             </div>
           }>
             <Routes>
-              {/* Public Routes */}
+              {/* Public Routes - Always start here */}
               <Route 
                 path="/login" 
-                element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} 
+                element={<Login />} 
               />
               <Route 
                 path="/register" 
-                element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} 
+                element={<Register />} 
               />
               
-              {/* Protected Routes */}
+              {/* Protected Routes - Require authentication */}
               <Route 
                 path="/" 
-                element={isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} 
+                element={<Navigate to="/login" replace />}
               />
               
               <Route element={<DashboardLayout />}>
