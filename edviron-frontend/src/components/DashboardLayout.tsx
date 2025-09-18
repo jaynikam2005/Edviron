@@ -4,8 +4,7 @@ import { useTheme } from '../hooks/useTheme';
 
 const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const themeData = useTheme() || { theme: 'light', isDark: false, toggleTheme: () => {} };
-  const { theme, isDark, toggleTheme } = themeData;
+  const { theme, isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const handleLogout = () => {
@@ -102,16 +101,10 @@ const DashboardLayout: React.FC = () => {
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div 
-            className="fixed inset-0 bg-gray-600 bg-opacity-75" 
+          <button
+            type="button"
+            className="fixed inset-0 bg-gray-600 bg-opacity-75 w-full h-full"
             onClick={() => setSidebarOpen(false)}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
-                setSidebarOpen(false);
-              }
-            }}
-            role="button"
-            tabIndex={0}
             aria-label="Close sidebar"
           />
         </div>

@@ -70,6 +70,26 @@ const SchoolTransactionSearch: React.FC = () => {
     school.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  
+  const fetchSchoolTransactions = React.useCallback(async () => {
+    if (!selectedSchool) return;
+
+    try {
+      setLoading(true);
+      setError('');
+
+      const response = await apiService.transactions.getBySchool(selectedSchool, filters);
+      setTransactions(response?.data?.data ?? []);
+      setPagination(prev => response?.data?.pagination ?? prev);
+    } catch (err: unknown) {
+      const respErr = err as { response?: { data?: { message?: string } } };
+      setError(respErr.response?.data?.message || 'Failed to fetch school transactions');
+      console.error('School transactions error:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedSchool, filters]);
+
   useEffect(() => {
     if (selectedSchool) {
       fetchSchoolTransactions();
@@ -84,26 +104,7 @@ const SchoolTransactionSearch: React.FC = () => {
         has_prev: false,
       });
     }
-  }, [selectedSchool, filters]); // fetchSchoolTransactions is stable
-
-  const fetchSchoolTransactions = async () => {
-    if (!selectedSchool) return;
-    
-    try {
-      setLoading(true);
-      setError('');
-      
-      const response = await apiService.transactions.getBySchool(selectedSchool, filters);
-      setTransactions(response.data.data || []);
-      setPagination(response.data.pagination || pagination);
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || 'Failed to fetch school transactions');
-      console.error('School transactions error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [selectedSchool, filters, fetchSchoolTransactions]);
 
   const handleFilterChange = (key: string, value: string | number) => {
     setFilters(prev => ({

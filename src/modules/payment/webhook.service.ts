@@ -10,7 +10,7 @@ import {
   WebhookLogsDocument,
 } from '../../schemas/webhook-logs.schema';
 import { Order, OrderDocument } from '../../schemas/order.schema';
-import { WebhookPayloadDto, WebhookResponseDto } from '../../dto/webhook.dto';
+import { WebhookPayloadDto, WebhookResponseDto, OrderInfoDto } from '../../dto/webhook.dto';
 
 @Injectable()
 export class WebhookService {
@@ -28,9 +28,7 @@ export class WebhookService {
     payload: WebhookPayloadDto,
   ): Promise<WebhookResponseDto> {
     try {
-      this.logger.log(
-        `Processing webhook for order: ${payload.order_info.order_id}`,
-      );
+      this.logger.log(`Processing webhook for order: ${String(payload.order_info?.order_id)}`);
 
       // Log the webhook payload first
       await this.logWebhookPayload(payload, 'received');
@@ -55,20 +53,21 @@ export class WebhookService {
       await this.updateOrderStatus(order, payload);
 
       // Log successful processing
-      await this.logWebhookPayload(payload, 'processed');
+  await this.logWebhookPayload(payload, 'processed');
 
-      this.logger.log(`Webhook processed successfully for order: ${order._id}`);
+  this.logger.log(`Webhook processed successfully for order: ${String(order._id)}`);
 
       return {
         success: true,
         message: 'Webhook processed successfully',
         processed_at: new Date(),
       };
-    } catch (error) {
-      this.logger.error('Error processing webhook:', error);
+    } catch (error: unknown) {
+      this.logger.error('Error processing webhook:', error as any);
 
+      const msg = error instanceof Error ? error.message : String(error);
       // Log the error
-      await this.logWebhookPayload(payload, 'error', error.message);
+      await this.logWebhookPayload(payload, 'error', msg);
 
       return {
         success: false,
@@ -78,15 +77,15 @@ export class WebhookService {
     }
   }
 
-  private async findOrder(orderInfo: any): Promise<OrderDocument | null> {
+  private async findOrder(orderInfo: OrderInfoDto): Promise<OrderDocument | null> {
     // Try to find by MongoDB _id first
-    if (orderInfo.order_id?.match(/^[0-9a-fA-F]{24}$/)) {
+    if (typeof orderInfo.order_id === 'string' && /^[0-9a-fA-F]{24}$/.test(orderInfo.order_id)) {
       const order = await this.orderModel.findById(orderInfo.order_id).exec();
       if (order) return order;
     }
 
     // Try to find by custom_order_id
-    if (orderInfo.custom_order_id) {
+    if (orderInfo.custom_order_id && typeof orderInfo.custom_order_id === 'string') {
       const order = await this.orderModel
         .findOne({ custom_order_id: orderInfo.custom_order_id })
         .exec();
@@ -94,7 +93,7 @@ export class WebhookService {
     }
 
     // Try to find by order_id as custom_order_id
-    if (orderInfo.order_id) {
+    if (orderInfo.order_id && typeof orderInfo.order_id === 'string') {
       const order = await this.orderModel
         .findOne({ custom_order_id: orderInfo.order_id })
         .exec();

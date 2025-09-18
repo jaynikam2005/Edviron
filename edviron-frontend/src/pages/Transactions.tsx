@@ -106,11 +106,7 @@ const Transactions: React.FC = () => {
     setSearchParams(params);
   };
 
-  useEffect(() => {
-    fetchTransactions();
-  }, [filters]); // fetchTransactions is stable
-
-  const fetchTransactions = async () => {
+  const fetchTransactions = React.useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -164,8 +160,8 @@ const Transactions: React.FC = () => {
         });
       }
 
-      setTransactions(data);
-      setPagination(response.data.pagination || pagination);
+  setTransactions(data);
+  setPagination((prev) => response.data.pagination || prev);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(error.response?.data?.message || 'Failed to fetch transactions');
@@ -173,7 +169,11 @@ const Transactions: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   const handleSort = (column: string) => {
     const newOrder = filters.sortBy === column && filters.sortOrder === 'desc' ? 'asc' : 'desc';
@@ -285,11 +285,12 @@ const Transactions: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="tx-search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Search
             </label>
             <div className="relative">
               <input
+                id="tx-search"
                 type="text"
                 value={filters.search}
                 onChange={(e) => updateFilters({ search: e.target.value })}
@@ -304,7 +305,7 @@ const Transactions: React.FC = () => {
 
           {/* Status Filter */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="tx-status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Status ({filters.statuses.length} selected)
             </label>
             <button
@@ -342,10 +343,11 @@ const Transactions: React.FC = () => {
 
           {/* School ID Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="tx-schoolId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               School ID
             </label>
             <input
+              id="tx-schoolId"
               type="text"
               value={filters.schoolId}
               onChange={(e) => updateFilters({ schoolId: e.target.value })}
@@ -356,10 +358,11 @@ const Transactions: React.FC = () => {
 
           {/* Items per page */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="tx-limit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Items per page
             </label>
             <select
+              id="tx-limit"
               value={filters.limit}
               onChange={(e) => updateFilters({ limit: parseInt(e.target.value) })}
               className="input-field"
@@ -375,10 +378,11 @@ const Transactions: React.FC = () => {
         {/* Date Range Filter */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="tx-dateFrom" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Date From
             </label>
             <input
+              id="tx-dateFrom"
               type="date"
               value={filters.dateFrom}
               onChange={(e) => updateFilters({ dateFrom: e.target.value })}
@@ -386,10 +390,11 @@ const Transactions: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="tx-dateTo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Date To
             </label>
             <input
+              id="tx-dateTo"
               type="date"
               value={filters.dateTo}
               onChange={(e) => updateFilters({ dateTo: e.target.value })}

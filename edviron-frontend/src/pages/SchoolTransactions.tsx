@@ -157,11 +157,11 @@ const SchoolTransactions: React.FC = () => {
           </div>
           
           <div>
-            <label htmlFor="custom-school-id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="school-search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Custom School ID
             </label>
             <input
-              id="custom-school-id"
+              id="school-search"
               type="text"
               value={selectedSchool}
               onChange={(e) => handleSchoolChange(e.target.value)}

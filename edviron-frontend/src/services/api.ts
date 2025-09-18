@@ -12,14 +12,15 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('access_token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      (config.headers as Record<string, string | undefined>).Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
-    return Promise.reject(new Error(error?.message || 'Request failed'));
+    const message = extractErrorMessage(error) || 'Request failed';
+    return Promise.reject(new Error(message));
   }
 );
 
@@ -33,11 +34,22 @@ api.interceptors.response.use(
     const axiosError = error as { response?: { status?: number } };
     if (axiosError.response?.status === 401) {
       localStorage.removeItem('access_token');
+      localStorage.removeItem('accessToken');
       window.location.href = '/login';
     }
-    return Promise.reject(error);
+    const msg = extractErrorMessage(error) || 'Response error';
+    return Promise.reject(new Error(msg));
   }
 );
+
+function extractErrorMessage(err: unknown): string | undefined {
+  if (!err || typeof err !== 'object') return undefined;
+  type ErrorLike = { message?: unknown; toString?: unknown };
+  const e = err as ErrorLike;
+  if (typeof e.message === 'string') return e.message;
+  if (typeof e.toString === 'function') return String(e.toString());
+  return undefined;
+}
 
 // API service methods
 export const apiService = {
