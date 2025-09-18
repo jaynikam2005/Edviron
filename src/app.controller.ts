@@ -22,7 +22,7 @@ export class AppController {
       services: {
         api: 'running',
         database: 'connected',
-        auth: 'active'
+        auth: 'active',
       },
     };
   }
@@ -37,23 +37,23 @@ export class AppController {
         auth: {
           login: 'POST /auth/login',
           profile: 'GET /auth/profile',
-          'login-guard': 'POST /auth/login-guard'
+          'login-guard': 'POST /auth/login-guard',
         },
         users: {
           create: 'POST /users',
           findAll: 'GET /users',
           findOne: 'GET /users/:id',
           update: 'PATCH /users/:id',
-          remove: 'DELETE /users/:id'
+          remove: 'DELETE /users/:id',
         },
         payment: {
           create: 'POST /payment/create',
-          status: 'GET /payment/status/:id'
+          status: 'GET /payment/status/:id',
         },
         transactions: {
           getAll: 'GET /transactions',
           getBySchool: 'GET /transactions/school/:schoolId',
-          getStatus: 'GET /transactions/status/:orderId'
+          getStatus: 'GET /transactions/status/:orderId',
         },
       },
       health: '/health',

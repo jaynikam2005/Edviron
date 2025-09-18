@@ -39,16 +39,18 @@ const Login: React.FC = () => {
 
     try {
       const response = await authAPI.login(formData);
-      const { access_token } = response.data;
+      const { access_token, user } = response.data;
       
-      // Store token in localStorage
+      // Store token and user info in localStorage
       localStorage.setItem('accessToken', access_token);
+      localStorage.setItem('user', JSON.stringify(user));
       
       // Redirect to dashboard
       navigate('/dashboard');
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || 'Login failed. Please try again.');
+      console.error('Login error:', err);
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      setError(error.response?.data?.message || error.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
