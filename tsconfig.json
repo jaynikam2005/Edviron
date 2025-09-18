@@ -23,7 +23,7 @@
     "noFallthroughCasesInSwitch": false,
     "allowJs": true,
     "checkJs": false,
-    "noEmit": true,
+    "noEmit": false,
     "strict": false
   },
   "include": [
