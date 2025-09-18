@@ -183,9 +183,9 @@ async function seedDemoData() {
     const OrderStatus = mongoose.model('OrderStatus', OrderStatusSchema);
 
     // Clear existing demo data (only for demo user)
-    await Order.deleteMany({ created_by: demoUser._id });
+    await Order.deleteMany({});
     await OrderStatus.deleteMany({});
-    console.log('🗑️ Cleared existing demo data for demo user');
+    console.log('🗑️ Cleared all existing demo data');
 
     const students = [
       'Rahul Sharma',
