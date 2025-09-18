@@ -55,12 +55,8 @@ export class TransactionController {
 export class TransactionStatusController {
   constructor(private readonly transactionService: TransactionService) {}
 
-    @Get(':custom_order_id')
-  async getTransactionStatus(
-    @Param('custom_order_id') customOrderId: string,
-  ) {
-    return await this.transactionService.getTransactionStatus(
-      customOrderId,
-    );
+  @Get(':custom_order_id')
+  async getTransactionStatus(@Param('custom_order_id') customOrderId: string) {
+    return await this.transactionService.getTransactionStatus(customOrderId);
   }
 }

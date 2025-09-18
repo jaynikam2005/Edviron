@@ -17,7 +17,7 @@
 
 ## 📁 Project Structure
 
-```
+```text
 src/
 ├── config/
 │   └── configuration.ts          # Environment configuration
@@ -92,12 +92,17 @@ cp .env.example .env
 Edit the `.env` file with your configuration:
 
 ```env
-# Database Configuration
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/edviron?retryWrites=true&w=majority
+## 🔧 Environment Configuration
 
-# JWT Configuration
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-JWT_EXPIRES_IN=7d
+### Database Configuration
+
+```env
+
+```
+
+### JWT Configuration
+
+```env
 
 # Application Configuration
 PORT=3000
@@ -384,5 +389,7 @@ If you encounter any issues or have questions:
 3. Create an issue in the repository
 
 ---
+
+## 💝 Built with
 
 **Built with ❤️ using NestJS, MongoDB, and TypeScript**

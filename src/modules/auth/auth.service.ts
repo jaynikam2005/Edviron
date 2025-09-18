@@ -49,11 +49,7 @@ export class AuthService {
     return null;
   }
 
-  async login(
-    loginDto: LoginDto,
-    ipAddress?: string,
-    userAgent?: string,
-  ) {
+  async login(loginDto: LoginDto, ipAddress?: string, userAgent?: string) {
     const user = await this.validateUser(loginDto.email, loginDto.password);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -104,7 +100,9 @@ export class AuthService {
 
     try {
       const payload = this.jwtService.verify(refreshToken);
-      const user = await this.userService.findOne((payload as TokenPayload).sub);
+      const user = await this.userService.findOne(
+        (payload as TokenPayload).sub,
+      );
 
       if (!user) {
         throw new UnauthorizedException('User not found');
@@ -112,7 +110,7 @@ export class AuthService {
 
       // Convert user to AuthenticatedUser
       const authenticatedUser: AuthenticatedUser = {
-        _id: user._id.toString(),
+        _id: (user as any)._id.toString(),
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -137,7 +135,7 @@ export class AuthService {
         access_token: newTokens.accessToken,
         refresh_token: newTokens.refreshToken,
       };
-    } catch (error) {
+    } catch {
       // Revoke the token if verification fails
       await this.revokeRefreshToken(refreshToken, 'Invalid token');
       throw new UnauthorizedException('Invalid refresh token');

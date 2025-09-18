@@ -28,6 +28,7 @@
   },
   "include": [
     "src/**/*",
+    "test/**/*",
     "scripts/**/*"
   ],
   "exclude": ["edviron-frontend", "node_modules", "dist"]

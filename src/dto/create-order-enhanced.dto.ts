@@ -41,7 +41,8 @@ export class CreateOrderDto {
   @IsNotEmpty()
   @Transform(({ value }) => value?.trim())
   @Matches(/^[a-zA-Z0-9_-]+$/, {
-    message: 'school_id must contain only alphanumeric characters, hyphens, and underscores',
+    message:
+      'school_id must contain only alphanumeric characters, hyphens, and underscores',
   })
   school_id: string;
 
@@ -49,7 +50,8 @@ export class CreateOrderDto {
   @IsNotEmpty()
   @Transform(({ value }) => value?.trim())
   @Matches(/^[a-zA-Z0-9_-]+$/, {
-    message: 'trustee_id must contain only alphanumeric characters, hyphens, and underscores',
+    message:
+      'trustee_id must contain only alphanumeric characters, hyphens, and underscores',
   })
   trustee_id: string;
 

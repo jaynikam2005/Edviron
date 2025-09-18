@@ -15,8 +15,12 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return API information', () => {
+      const result = appController.getHello();
+      const parsed = JSON.parse(result);
+      expect(parsed.message).toBe('Welcome to Edviron API! 🚀');
+      expect(parsed.version).toBe('1.0.0');
+      expect(parsed.status).toBe('active');
     });
   });
 });

@@ -4,7 +4,6 @@ import {
   IsEnum,
   IsNumberString,
   IsIn,
-  ValidateIf,
   Length,
   Matches,
 } from 'class-validator';
@@ -13,12 +12,16 @@ import { Transform } from 'class-transformer';
 export class TransactionQueryEnhancedDto {
   @IsOptional()
   @IsNumberString({}, { message: 'page must be a valid number' })
-  @Transform(({ value }) => value?.toString())
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' || typeof value === 'number' ? String(value) : '',
+  )
   page?: string;
 
   @IsOptional()
   @IsNumberString({}, { message: 'limit must be a valid number' })
-  @Transform(({ value }) => value?.toString())
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' || typeof value === 'number' ? String(value) : '',
+  )
   limit?: string;
 
   @IsOptional()
@@ -63,7 +66,8 @@ export class TransactionQueryEnhancedDto {
 
   @IsOptional()
   @IsIn(['createdAt', 'payment_time', 'order_amount', 'custom_order_id'], {
-    message: 'sort must be one of: createdAt, payment_time, order_amount, custom_order_id',
+    message:
+      'sort must be one of: createdAt, payment_time, order_amount, custom_order_id',
   })
   sort?: string;
 

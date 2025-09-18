@@ -36,7 +36,7 @@ export class TransactionService {
     operation?: string,
   ): boolean {
     const isDemoUser = user?.email === 'admin@edviron.com';
-    
+
     if (!isDemoUser && operation) {
       this.logger.log(
         `Non-demo user ${user?.email || 'unknown'} attempted to access ${operation}`,
@@ -44,7 +44,7 @@ export class TransactionService {
     } else if (isDemoUser && operation) {
       this.logger.log(`Demo user ${user?.email} accessing ${operation}`);
     }
-    
+
     return isDemoUser;
   }
 
@@ -114,7 +114,7 @@ export class TransactionService {
   ): Promise<PaginatedTransactionResponseDto> {
     // Check if user is the demo user
     const isDemoUser = this.validateDemoUser(user, 'transactions');
-    
+
     // For non-demo users, return empty results
     if (!isDemoUser) {
       return this.getEmptyTransactionResponse(query);
@@ -221,7 +221,7 @@ export class TransactionService {
       user,
       `school transactions for ${schoolId}`,
     );
-    
+
     // For non-demo users, return empty results
     if (!isDemoUser) {
       return this.getEmptyTransactionResponse(query);
@@ -353,7 +353,7 @@ export class TransactionService {
       user,
       `transaction status for ${customOrderId}`,
     );
-    
+
     // For non-demo users, deny access
     if (!isDemoUser) {
       throw new NotFoundException(
@@ -400,7 +400,6 @@ export class TransactionService {
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const transaction = result[0];
 
     if (!transaction || typeof transaction !== 'object') {
