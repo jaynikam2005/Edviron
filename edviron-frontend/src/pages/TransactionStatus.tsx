@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { apiService } from '../services/api';
+import { transactionAPI } from '../services/api';
 
 interface TransactionStatusData {
   custom_order_id: string;
@@ -32,7 +32,7 @@ const TransactionStatus: React.FC = () => {
       setTransactionStatus(null);
       setSearched(false);
       
-      const response = await apiService.transactions.getStatus(orderId.trim());
+      const response = await transactionAPI.getStatus(orderId.trim());
       setTransactionStatus(response.data);
       setSearched(true);
     } catch (err: unknown) {

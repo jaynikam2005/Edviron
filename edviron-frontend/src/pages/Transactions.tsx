@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { apiService } from '../services/api';
+import api from '../services/api';
 
 interface Transaction {
   _id: string;
@@ -122,7 +122,7 @@ const Transactions: React.FC = () => {
         apiFilters.status = filters.statuses[0]; // API might not support multiple statuses
       }
       
-      const response = await apiService.transactions.getAll(apiFilters);
+      const response = await api.get('/transactions', { params: apiFilters });
       let data = response.data.data || [];
       
       // Client-side filtering for features not supported by API

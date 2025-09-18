@@ -1,46 +1,6 @@
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  Min,
-  Max,
-  IsIn,
-} from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
 
 export class TransactionQueryDto {
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  page?: number = 1;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  @Max(100)
-  limit?: number = 10;
-
-  @IsOptional()
-  @IsString()
-  @IsIn([
-    'payment_time',
-    'createdAt',
-    'updatedAt',
-    'order_amount',
-    'transaction_amount',
-    'status',
-    'school_id',
-    'custom_order_id',
-  ])
-  sort?: string = 'payment_time';
-
-  @IsOptional()
-  @IsString()
-  @IsIn(['asc', 'desc'])
-  order?: string = 'desc';
-
   @IsOptional()
   @IsString()
   status?: string;
@@ -52,6 +12,25 @@ export class TransactionQueryDto {
   @IsOptional()
   @IsString()
   gateway_name?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number;
+
+  @IsOptional()
+  @IsString()
+  sort?: string;
+
+  @IsOptional()
+  @IsString()
+  order?: string;
 }
 
 export class TransactionResponseDto {

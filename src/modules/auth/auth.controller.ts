@@ -5,7 +5,6 @@ import {
   UseGuards,
   Request,
   ValidationPipe,
-  UnauthorizedException,
   Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -14,6 +13,14 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { Public } from '../../decorators/public.decorator';
 import { LoginDto } from '../../dto/login.dto';
 
+interface AuthenticatedRequest {
+  user: {
+    email: string;
+    _id: string;
+    role: string;
+  };
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -21,16 +28,12 @@ export class AuthController {
   @Public()
   @Post('login')
   async login(@Body(ValidationPipe) loginDto: LoginDto) {
-    try {
-      return await this.authService.login(loginDto);
-    } catch (error) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    return await this.authService.login(loginDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  async getProfile(@Request() req) {
+  getProfile(@Request() req: AuthenticatedRequest) {
     // This endpoint is protected by JWT - requires valid token
     return {
       message: 'This is a protected route',
@@ -41,7 +44,7 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login-guard')
-  async loginWithGuard(@Request() req) {
+  loginWithGuard(@Request() req: AuthenticatedRequest) {
     // This endpoint uses the LocalAuthGuard for validation
     const payload = {
       email: req.user.email,

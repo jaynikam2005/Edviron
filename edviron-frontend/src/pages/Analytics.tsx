@@ -16,7 +16,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { apiService } from '../services/api';
+import api from '../services/api';
 
 interface TransactionTrend {
   date: string;
@@ -128,7 +128,7 @@ const Analytics: React.FC = () => {
       setError('');
       
       // Simulate API call - in real app, this would fetch from analytics endpoint
-      await apiService.transactions.getAll({ limit: 100 });
+      await api.get('/transactions', { params: { limit: 100 } });
       
       // Process data for charts
       const processedData = processTransactionData();

@@ -7,6 +7,7 @@ const DashboardLayout: React.FC = () => {
   const { theme, isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
     navigate('/login');

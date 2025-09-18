@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { apiService } from '../services/api';
+import api from '../services/api';
 
 interface Transaction {
   _id: string;
@@ -64,7 +64,7 @@ const SchoolTransactions: React.FC = () => {
       setLoading(true);
       setError('');
       
-      const response = await apiService.transactions.getBySchool(selectedSchool, filters);
+      const response = await api.get(`/transactions/school/${selectedSchool}`, { params: filters });
       setTransactions(response.data.data || []);
       setPagination(prevPagination => response.data.pagination || prevPagination);
     } catch (err: unknown) {

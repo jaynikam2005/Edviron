@@ -1,18 +1,9 @@
-import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
-
-export type ThemeName = 'light' | 'dark' | 'system';
-
-export interface ThemeContextType {
-  theme: ThemeName;
-  isDark: boolean;
-  toggleTheme: () => void;
-  setTheme: (t: ThemeName) => void;
-}
-
-export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import type { ThemeName } from '../types/theme';
+import { ThemeContext } from './ThemeContextDefinition';
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<ThemeName>(() => {
+  const [theme, setTheme] = useState<ThemeName>(() => {
     try {
       const stored = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
       return (stored as ThemeName) || 'light';
@@ -44,7 +35,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const handler = () => {
       if (theme === 'system') {
-        setThemeState((t) => (t === 'system' ? 'system' : t));
+        setTheme((t) => (t === 'system' ? 'system' : t));
       }
     };
 
@@ -62,11 +53,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return undefined;
   }, [theme]);
 
-  const setTheme = useCallback((t: ThemeName) => setThemeState(t), []);
+  const setThemeValue = useCallback((t: ThemeName) => setTheme(t), []);
 
-  const toggleTheme = useCallback(() => setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark')), []);
+  const toggleTheme = useCallback(() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark')), []);
 
-  const value = useMemo(() => ({ theme, isDark, toggleTheme, setTheme }), [theme, isDark, toggleTheme, setTheme]);
+  const value = useMemo(() => ({ theme, isDark, toggleTheme, setTheme: setThemeValue }), [theme, isDark, toggleTheme, setThemeValue]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };

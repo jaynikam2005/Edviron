@@ -3,12 +3,19 @@ import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as jwt from 'jsonwebtoken';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Order, OrderDocument } from '../../schemas/order.schema';
 import {
   CreatePaymentDto,
   PaymentResponseDto,
 } from '../../dto/create-payment.dto';
+
+interface ApiResponse {
+  collect_request_url?: string;
+  payment_link?: string;
+  url?: string;
+  message?: string;
+}
 
 @Injectable()
 export class PaymentService {
@@ -18,6 +25,18 @@ export class PaymentService {
     @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     private readonly configService: ConfigService,
   ) {}
+
+  private extractErrorMessage(data: unknown): string {
+    if (
+      typeof data === 'object' &&
+      data !== null &&
+      'message' in data &&
+      typeof (data as Record<string, unknown>).message === 'string'
+    ) {
+      return (data as Record<string, string>).message;
+    }
+    return 'External API error';
+  }
 
   async createPayment(
     createPaymentDto: CreatePaymentDto,
@@ -50,9 +69,9 @@ export class PaymentService {
       const apiKey = this.configService.get<string>('payment.apiKey');
       const baseUrl = this.configService.get<string>('payment.baseUrl');
 
-      if (!apiKey) {
+      if (!apiKey || !baseUrl) {
         throw new HttpException(
-          'Payment API key not configured',
+          'Payment API key or base URL not configured',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
@@ -60,7 +79,7 @@ export class PaymentService {
       const apiUrl = `${baseUrl}/erp/create-collect-request`;
 
       // Call Edviron Create Collect Request API
-      const apiResponse = await axios.post(
+      const apiResponse: AxiosResponse<ApiResponse> = await axios.post(
         apiUrl,
         {
           signed_payload: signedToken,
@@ -94,22 +113,16 @@ export class PaymentService {
       });
 
       const savedOrder = await order.save();
-      this.logger.log(`Order saved with ID: ${savedOrder._id}`);
+      const orderId = String(savedOrder._id); // Explicitly convert ObjectId to string
+      this.logger.log(`Order saved with ID: ${orderId}`);
 
       // Extract payment link from API response
-      const collectRequestUrl =
-        apiResponse.data?.collect_request_url ||
-        apiResponse.data?.payment_link ||
-        apiResponse.data?.url;
-
-      if (!collectRequestUrl) {
-        this.logger.warn('No payment URL found in API response');
-      }
+      const collectRequestUrl = this.extractPaymentUrl(apiResponse.data);
 
       return {
         success: true,
         message: 'Payment request created successfully',
-        order_id: (savedOrder._id as any).toString(),
+        order_id: orderId,
         payment_link: collectRequestUrl,
         collect_request_url: collectRequestUrl,
       };
@@ -118,7 +131,7 @@ export class PaymentService {
 
       if (axios.isAxiosError(error)) {
         const status = error.response?.status || HttpStatus.BAD_GATEWAY;
-        const message = error.response?.data?.message || 'External API error';
+        const message = this.extractErrorMessage(error.response?.data);
         throw new HttpException(
           `Payment gateway error: ${message}`,
           status >= 400 && status < 500
@@ -136,6 +149,15 @@ export class PaymentService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  private extractPaymentUrl(data: ApiResponse): string {
+    if (data.collect_request_url) return data.collect_request_url;
+    if (data.payment_link) return data.payment_link;
+    if (data.url) return data.url;
+
+    this.logger.warn('No payment URL found in API response');
+    return '';
   }
 
   private generateOrderId(): string {

@@ -9,18 +9,67 @@ import {
 import {
   TransactionQueryDto,
   PaginatedTransactionResponseDto,
+  TransactionResponseDto,
   TransactionStatusResponseDto,
 } from '../../dto/transaction-query.dto';
+
+interface MatchConditions {
+  [key: string]: string | number | undefined;
+}
+
+interface SortObject {
+  [key: string]: 1 | -1;
+}
 
 @Injectable()
 export class TransactionService {
   private readonly logger = new Logger(TransactionService.name);
 
   constructor(
-    @InjectModel(Order.name) private orderModel: Model<OrderDocument>,
+    @InjectModel(Order.name) private readonly orderModel: Model<OrderDocument>,
     @InjectModel(OrderStatus.name)
-    private orderStatusModel: Model<OrderStatusDocument>,
+    private readonly orderStatusModel: Model<OrderStatusDocument>,
   ) {}
+
+  private buildMatchConditions(
+    query: TransactionQueryDto,
+  ): Record<string, any> {
+    const { status, payment_mode, gateway_name } = query;
+    const matchConditions: Record<string, any> = {};
+    if (status) matchConditions['orderStatus.status'] = status;
+    if (payment_mode)
+      matchConditions['orderStatus.payment_mode'] = payment_mode;
+    if (gateway_name) matchConditions['gateway_name'] = gateway_name;
+    return matchConditions;
+  }
+
+  private buildSortObject(sort: string, order: string): Record<string, 1 | -1> {
+    const sortObj: Record<string, 1 | -1> = {};
+    const orderValue = order === 'asc' ? 1 : -1;
+    switch (sort) {
+      case 'payment_time':
+        sortObj['orderStatus.payment_time'] = orderValue;
+        break;
+      case 'order_amount':
+        sortObj['orderStatus.order_amount'] = orderValue;
+        break;
+      case 'transaction_amount':
+        sortObj['orderStatus.transaction_amount'] = orderValue;
+        break;
+      case 'status':
+        sortObj['orderStatus.status'] = orderValue;
+        break;
+      case 'school_id':
+        sortObj['school_id'] = orderValue;
+        break;
+      case 'custom_order_id':
+        sortObj['custom_order_id'] = orderValue;
+        break;
+      default:
+        sortObj['createdAt'] = orderValue;
+    }
+    return sortObj;
+  }
 
   async getAllTransactions(
     query: TransactionQueryDto,
@@ -30,36 +79,11 @@ export class TransactionService {
       limit = 10,
       sort = 'payment_time',
       order = 'desc',
-      status,
-      payment_mode,
-      gateway_name,
     } = query;
     const skip = (page - 1) * limit;
 
-    // Build match conditions
-    const matchConditions: any = {};
-    if (status) matchConditions['orderStatus.status'] = status;
-    if (payment_mode)
-      matchConditions['orderStatus.payment_mode'] = payment_mode;
-    if (gateway_name) matchConditions['gateway_name'] = gateway_name;
-
-    // Build sort object
-    const sortObj: any = {};
-    if (sort === 'payment_time') {
-      sortObj['orderStatus.payment_time'] = order === 'asc' ? 1 : -1;
-    } else if (sort === 'order_amount') {
-      sortObj['orderStatus.order_amount'] = order === 'asc' ? 1 : -1;
-    } else if (sort === 'transaction_amount') {
-      sortObj['orderStatus.transaction_amount'] = order === 'asc' ? 1 : -1;
-    } else if (sort === 'status') {
-      sortObj['orderStatus.status'] = order === 'asc' ? 1 : -1;
-    } else if (sort === 'school_id') {
-      sortObj['school_id'] = order === 'asc' ? 1 : -1;
-    } else if (sort === 'custom_order_id') {
-      sortObj['custom_order_id'] = order === 'asc' ? 1 : -1;
-    } else {
-      sortObj['createdAt'] = order === 'asc' ? 1 : -1;
-    }
+    const matchConditions = this.buildMatchConditions(query);
+    const sortObj = this.buildSortObject(sort, order);
 
     const pipeline = [
       {
@@ -77,7 +101,7 @@ export class TransactionService {
         },
       },
       {
-        $match: Object.keys(matchConditions).length > 0 ? matchConditions : {},
+        $match: matchConditions,
       },
       {
         $project: {
@@ -109,12 +133,15 @@ export class TransactionService {
     // Get total count
     const countPipeline = [...pipeline, { $count: 'total' }];
     const countResult = await this.orderModel.aggregate(countPipeline).exec();
-    const totalItems = countResult.length > 0 ? countResult[0].total : 0;
+    const totalItems =
+      countResult.length > 0
+        ? Number((countResult[0] as { total?: number })?.total || 0)
+        : 0;
 
-    // Get paginated data
     const dataPipeline = [...pipeline, { $skip: skip }, { $limit: limit }];
-
-    const transactions = await this.orderModel.aggregate(dataPipeline).exec();
+    const transactions = (await this.orderModel
+      .aggregate(dataPipeline)
+      .exec()) as TransactionResponseDto[];
 
     const totalPages = Math.ceil(totalItems / limit);
 
@@ -154,13 +181,13 @@ export class TransactionService {
     const skip = (page - 1) * limit;
 
     // Build match conditions
-    const matchConditions: any = { school_id: schoolId };
+    const matchConditions: MatchConditions = { school_id: schoolId };
     if (status) matchConditions['orderStatus.status'] = status;
     if (payment_mode)
       matchConditions['orderStatus.payment_mode'] = payment_mode;
 
     // Build sort object
-    const sortObj: any = {};
+    const sortObj: SortObject = {};
     if (sort === 'payment_time') {
       sortObj['orderStatus.payment_time'] = order === 'asc' ? 1 : -1;
     } else if (sort === 'order_amount') {
@@ -226,12 +253,17 @@ export class TransactionService {
     // Get total count
     const countPipeline = [...pipeline, { $count: 'total' }];
     const countResult = await this.orderModel.aggregate(countPipeline).exec();
-    const totalItems = countResult.length > 0 ? countResult[0].total : 0;
+    const totalItems =
+      countResult.length > 0
+        ? Number((countResult[0] as { total?: number })?.total || 0)
+        : 0;
 
     // Get paginated data
     const dataPipeline = [...pipeline, { $skip: skip }, { $limit: limit }];
 
-    const transactions = await this.orderModel.aggregate(dataPipeline).exec();
+    const transactions = (await this.orderModel
+      .aggregate(dataPipeline)
+      .exec()) as TransactionResponseDto[];
 
     const totalPages = Math.ceil(totalItems / limit);
 
@@ -299,19 +331,42 @@ export class TransactionService {
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const transaction = result[0];
+
+    if (!transaction || typeof transaction !== 'object') {
+      throw new NotFoundException(
+        `Transaction with custom_order_id '${customOrderId}' not found`,
+      );
+    }
+
+    const safeGet = (
+      obj: any,
+      key: string,
+      defaultValue: any = undefined,
+    ): any => {
+      return obj && typeof obj === 'object' && key in obj
+        ? (obj as Record<string, any>)[key]
+        : defaultValue;
+    };
 
     this.logger.log(`Retrieved transaction status for order: ${customOrderId}`);
 
     return {
-      custom_order_id: transaction.custom_order_id,
-      status: transaction.status || 'pending',
-      order_amount: transaction.order_amount,
-      transaction_amount: transaction.transaction_amount,
-      payment_mode: transaction.payment_mode,
-      payment_time: transaction.payment_time,
-      error_message: transaction.error_message,
-      last_updated: transaction.last_updated || new Date(),
+      custom_order_id: String(safeGet(transaction, 'custom_order_id', '')),
+      status: String(safeGet(transaction, 'status', 'pending')),
+      order_amount: Number(safeGet(transaction, 'order_amount', 0)),
+      transaction_amount: Number(safeGet(transaction, 'transaction_amount', 0)),
+      payment_mode: String(safeGet(transaction, 'payment_mode', '')),
+      payment_time: safeGet(transaction, 'payment_time')
+        ? new Date(String(safeGet(transaction, 'payment_time')))
+        : undefined,
+      error_message: safeGet(transaction, 'error_message')
+        ? String(safeGet(transaction, 'error_message'))
+        : undefined,
+      last_updated: safeGet(transaction, 'last_updated')
+        ? new Date(String(safeGet(transaction, 'last_updated')))
+        : new Date(),
     };
   }
 }

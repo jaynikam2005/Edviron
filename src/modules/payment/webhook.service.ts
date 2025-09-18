@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
   OrderStatus,
   OrderStatusDocument,
@@ -10,7 +10,11 @@ import {
   WebhookLogsDocument,
 } from '../../schemas/webhook-logs.schema';
 import { Order, OrderDocument } from '../../schemas/order.schema';
-import { WebhookPayloadDto, WebhookResponseDto, OrderInfoDto } from '../../dto/webhook.dto';
+import {
+  WebhookPayloadDto,
+  WebhookResponseDto,
+  OrderInfoDto,
+} from '../../dto/webhook.dto';
 
 @Injectable()
 export class WebhookService {
@@ -28,10 +32,23 @@ export class WebhookService {
     payload: WebhookPayloadDto,
   ): Promise<WebhookResponseDto> {
     try {
-      this.logger.log(`Processing webhook for order: ${String(payload.order_info?.order_id)}`);
+      this.logger.log(
+        `Processing webhook for order: ${this.safeString(payload.order_info?.order_id)}`,
+      );
 
       // Log the webhook payload first
       await this.logWebhookPayload(payload, 'received');
+
+      // Validate order_info exists
+      if (!payload.order_info) {
+        this.logger.warn('Webhook payload missing order_info');
+        await this.logWebhookPayload(payload, 'invalid_payload');
+        return {
+          success: false,
+          message: 'Invalid payload: missing order_info',
+          processed_at: new Date(),
+        };
+      }
 
       // Find the order by order_id or custom_order_id
       const order = await this.findOrder(payload.order_info);
@@ -53,9 +70,11 @@ export class WebhookService {
       await this.updateOrderStatus(order, payload);
 
       // Log successful processing
-  await this.logWebhookPayload(payload, 'processed');
+      await this.logWebhookPayload(payload, 'processed');
 
-  this.logger.log(`Webhook processed successfully for order: ${String(order._id)}`);
+      this.logger.log(
+        `Webhook processed successfully for order: ${this.safeString(order._id)}`,
+      );
 
       return {
         success: true,
@@ -63,11 +82,12 @@ export class WebhookService {
         processed_at: new Date(),
       };
     } catch (error: unknown) {
-      this.logger.error('Error processing webhook:', error as any);
+      const errorMessage =
+        error instanceof Error ? error.message : this.safeString(error);
+      this.logger.error('Error processing webhook:', errorMessage);
 
-      const msg = error instanceof Error ? error.message : String(error);
       // Log the error
-      await this.logWebhookPayload(payload, 'error', msg);
+      await this.logWebhookPayload(payload, 'error', errorMessage);
 
       return {
         success: false,
@@ -77,15 +97,27 @@ export class WebhookService {
     }
   }
 
-  private async findOrder(orderInfo: OrderInfoDto): Promise<OrderDocument | null> {
+  private safeString(value: unknown): string {
+    return typeof value === 'string' ? value : JSON.stringify(value);
+  }
+
+  private async findOrder(
+    orderInfo: OrderInfoDto,
+  ): Promise<OrderDocument | null> {
     // Try to find by MongoDB _id first
-    if (typeof orderInfo.order_id === 'string' && /^[0-9a-fA-F]{24}$/.test(orderInfo.order_id)) {
+    if (
+      typeof orderInfo.order_id === 'string' &&
+      /^[0-9a-fA-F]{24}$/.test(orderInfo.order_id)
+    ) {
       const order = await this.orderModel.findById(orderInfo.order_id).exec();
       if (order) return order;
     }
 
     // Try to find by custom_order_id
-    if (orderInfo.custom_order_id && typeof orderInfo.custom_order_id === 'string') {
+    if (
+      orderInfo.custom_order_id &&
+      typeof orderInfo.custom_order_id === 'string'
+    ) {
       const order = await this.orderModel
         .findOne({ custom_order_id: orderInfo.custom_order_id })
         .exec();
@@ -108,14 +140,14 @@ export class WebhookService {
     payload: WebhookPayloadDto,
   ): Promise<void> {
     const orderStatusData = {
-      collect_id: order._id,
-      order_amount: payload.order_info.amount || 0,
-      transaction_amount: payload.amount || payload.order_info.amount || 0,
+      collect_id: new Types.ObjectId(order._id),
+      order_amount: payload.order_info?.amount || 0,
+      transaction_amount: payload.amount || payload.order_info?.amount || 0,
       payment_mode: payload.payment_method || 'unknown',
       payment_details: {
         transaction_id: payload.transaction_id,
         gateway_response: payload.gateway_response,
-        metadata: payload.metadata,
+        metadata: (payload.metadata as Record<string, unknown>) || {},
       },
       status: this.mapWebhookStatusToOrderStatus(payload.status),
       payment_time: new Date(),
@@ -143,7 +175,7 @@ export class WebhookService {
         .exec();
 
       this.logger.log(
-        `Updated existing OrderStatus: ${existingOrderStatus._id}`,
+        `Updated existing OrderStatus: ${this.safeString(existingOrderStatus._id)}`,
       );
     } else {
       // Create new record
@@ -154,7 +186,9 @@ export class WebhookService {
       });
 
       await newOrderStatus.save();
-      this.logger.log(`Created new OrderStatus: ${newOrderStatus._id}`);
+      this.logger.log(
+        `Created new OrderStatus: ${this.safeString(newOrderStatus._id)}`,
+      );
     }
   }
 
@@ -192,7 +226,7 @@ export class WebhookService {
       await webhookLog.save();
       this.logger.debug(`Webhook logged with status: ${processingStatus}`);
     } catch (error) {
-      this.logger.error('Failed to log webhook:', error);
+      this.logger.error('Failed to log webhook:', this.safeString(error));
       // Don't throw here to avoid breaking the main webhook processing
     }
   }
