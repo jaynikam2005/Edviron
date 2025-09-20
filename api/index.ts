@@ -43,6 +43,14 @@ export default async function handler(req: Request, res: Response) {
   const app = await bootstrap();
   const expressApp = app.getHttpAdapter().getInstance();
 
+  // Reconstruct original API path if Vercel rewrite added ?path= segment
+  const originalPath = (req.query as any).path as string | undefined;
+  if (originalPath) {
+    req.url = `/api/${originalPath}`;
+  } else if (req.url === '/api/' ) {
+    req.url = '/api';
+  }
+
   return new Promise((resolve) => {
     expressApp(req, res, () => resolve(undefined));
   });
