@@ -29,7 +29,9 @@
   "include": [
     "src/**/*",
     "test/**/*",
-    "scripts/**/*"
+    "scripts/**/*",
+    "api/**/*"
   ],
   "exclude": ["edviron-frontend", "node_modules", "dist"]
 }
+

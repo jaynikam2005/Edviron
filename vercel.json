@@ -6,8 +6,7 @@
       "src": "edviron-frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist",
-        "buildCommand": "cd edviron-frontend && npm ci && npm run build:prod"
+        "outputDirectory": "dist"
       }
     },
     {
@@ -15,65 +14,22 @@
       "use": "@vercel/node"
     }
   ],
-  "installCommand": "npm ci && cd edviron-frontend && npm ci",
-  "buildCommand": "npm run build",
+  "installCommand": "npm ci && npm install --prefix edviron-frontend",
+  "buildCommand": "npm run build && npm run build --prefix edviron-frontend",
   "rewrites": [
     {
-      "source": "/api",
-      "destination": "/api/index.ts"
-    },
-    {
       "source": "/api/(.*)",
-      "destination": "/api/index.ts?path=$1"
+      "destination": "/api/index.ts"
     }
   ],
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        }
-      ]
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts"
     },
     {
-      "source": "/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "src": "/(.*)",
+      "dest": "/edviron-frontend/dist/$1"
     }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "env": {
-    "NODE_VERSION": "18"
-  }
+  ]
 }
