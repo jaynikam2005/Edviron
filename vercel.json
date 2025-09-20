@@ -14,8 +14,8 @@
       "use": "@vercel/node"
     }
   ],
-  "installCommand": "npm ci && cd edviron-frontend && npm ci",
-  "buildCommand": "npm run build && cd edviron-frontend && npm run build:prod",
+  "installCommand": "npm install && npm install --prefix edviron-frontend",
+  "buildCommand": "npm run build && npm run build:prod --prefix edviron-frontend",
   "rewrites": [
     {
       "source": "/api",
