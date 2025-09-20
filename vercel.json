@@ -20,10 +20,6 @@
     {
       "source": "/api/(.*)",
       "destination": "/api/index.ts"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/edviron-frontend/dist/$1"
     }
   ],
   "headers": [
@@ -48,6 +44,7 @@
   ],
   "cleanUrls": true,
   "trailingSlash": false,
+  "public": "edviron-frontend/dist",
   "env": {
     "NODE_VERSION": "18"
   }
