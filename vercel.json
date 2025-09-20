@@ -1,6 +1,75 @@
 
 {
+  "version": 2,
+  "name": "edviron",
+  "builds": [
+    {
+      "src": "edviron-frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "installCommand": "npm ci && cd edviron-frontend && npm ci",
+  "buildCommand": "npm run build && cd edviron-frontend && npm run build:prod",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ]
+    {
+      "source": "/api",
+      "destination": "/api/index.ts"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.ts?path=$1"
+    },
+    {
+      "source": "/assets/(.*)",
+      "destination": "/edviron-frontend/dist/assets/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/edviron-frontend/dist/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "env": {
+    "NODE_VERSION": "18"
+  }
 }

@@ -47,7 +47,7 @@ export default async function handler(req: Request, res: Response) {
   const originalPath = (req.query as any).path as string | undefined;
   if (originalPath) {
     req.url = `/api/${originalPath}`;
-  } else if (req.url === '/api/' ) {
+  } else if (req.url === '/api/') {
     req.url = '/api';
   }
 
